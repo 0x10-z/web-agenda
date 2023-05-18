@@ -1,0 +1,39 @@
+name: Deploy to Server
+on:
+  push:
+    branches:
+      - dev
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:23.0-dind
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Prepare env files
+        run: |
+          current_date=$(date +'%y.%m.%d-%H%M%S')
+          echo NEXT_PUBLIC_APP_VERSION=$current_date > .env.local
+
+      - name: Build and push Docker Compose
+        run: |
+          docker-compose build
+          docker-compose push
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.IKEROCIOCOM_LIGHTSAIL_SSHKEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan ikerocio.com >> ~/.ssh/known_hosts
+
+      - name: Deploy code
+        run: |
+          ssh ec2-user@ikerocio.com "cd agenda && git pull && docker-compose stop && docker-compose pull && docker-compose up -d"

@@ -1,0 +1,11 @@
+services:
+  nextjs_agenda:
+    build: .
+    image: nextjs_agenda
+    container_name: nextjs_agenda
+    volumes:
+      - ./:/app:z
+    environment:
+      - "USE_DOCKER=yes"
+    ports:
+      - "3000:3000"
