@@ -36,4 +36,4 @@ jobs:
 
       - name: Deploy code
         run: |
-          ssh ec2-user@35.180.123.117 "cd agenda && git pull && docker-compose stop && docker-compose pull && docker-compose up -d"
+          ssh ec2-user@35.180.123.117 "cd agenda && docker-compose stop && docker-compose pull && docker-compose up -d"
