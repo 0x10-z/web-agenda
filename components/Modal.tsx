@@ -16,7 +16,10 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onAccept }) => {
   const formattedDate = selectedDate?.toISOString().substring(0, 10);
 
   const handleAccept = () => {
-    const formData: FormData = { fecha, hora, texto };
+    const formData = new FormData();
+    formData.append("fecha", fecha);
+    formData.append("hora", hora);
+    formData.append("texto", texto);
     onAccept(formData);
     onClose();
   };
