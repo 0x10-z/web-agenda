@@ -1,7 +1,9 @@
 services:
   nextjs_agenda:
-    build: .
-    image: nextjs_agenda
+    build:
+      context: .
+      dockerfile: ./Dockerfile.prod
+    image: iocio005/nextjs_agenda:latest
     container_name: nextjs_agenda
     volumes:
       - ./:/app:z

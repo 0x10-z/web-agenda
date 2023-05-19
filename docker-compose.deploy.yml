@@ -1,8 +1,6 @@
 services:
   nextjs_agenda:
     image: iocio005/nextjs_agenda:latest
-    volumes:
-      - ./:/app:z
     environment:
       - "USE_DOCKER=yes"
     ports:
