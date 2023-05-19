@@ -1,11 +1,9 @@
 services:
   nextjs_agenda:
-    build: .
     image: iocio005/nextjs_agenda:latest
-    container_name: nextjs_agenda
     volumes:
       - ./:/app:z
     environment:
       - "USE_DOCKER=yes"
     ports:
-      - "3000:3000"
+      - "8080:3000"
