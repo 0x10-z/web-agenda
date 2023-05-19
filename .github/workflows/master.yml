@@ -32,8 +32,8 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.IKEROCIOCOM_LIGHTSAIL_SSHKEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan blog.historiaurrutia.es >> ~/.ssh/known_hosts
+          ssh-keyscan 35.180.123.117 >> ~/.ssh/known_hosts
 
       - name: Deploy code
         run: |
-          ssh ec2-user@ikerocio.com "cd agenda && git pull && docker-compose stop && docker-compose pull && docker-compose up -d"
+          ssh ec2-user@35.180.123.117 "cd agenda && git pull && docker-compose stop && docker-compose pull && docker-compose up -d"
