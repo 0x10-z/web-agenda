@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import Image from "next/image";
 import { Modal } from "./Modal";
+import { showErrorToast } from "../utils/util";
+import React from "react";
 
 export default function Body() {
   const [selectedDate, setSelectedDate] = useState<Date>();
@@ -16,8 +17,25 @@ export default function Body() {
     setModalOpen(false);
   };
 
-  const handleAcceptModal = (data: FormData) => {
-    console.log(data);
+  const handleAcceptModal = async (data: FormData) => {
+    const formDataObj = Object.fromEntries(data.entries());
+    const jsonData = JSON.stringify(formDataObj);
+
+    try {
+      const response = await fetch("api/appointments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: jsonData,
+      });
+
+      if (response.ok) {
+        showErrorToast("El formulario se ha enviado correctamente");
+      } else {
+        showErrorToast("Error al enviar el formulario");
+      }
+    } catch (error) {
+      showErrorToast("Error al enviar el formulario:" + error);
+    }
   };
 
   const handleDateChange = (event: any) => {
@@ -62,7 +80,7 @@ export default function Body() {
               onClickDay={setSelectedDate}
               locale="es-ES"
             />
-            <Image
+            <img
               alt="h2u-logo-picture"
               src="/paredh2u.jpg"
               width={600}

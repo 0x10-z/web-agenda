@@ -1,11 +1,25 @@
 services:
-  nextjs_agenda:
-    build: .
-    image: nextjs_agenda
-    container_name: nextjs_agenda
+  backend_agenda:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend_agenda
     volumes:
-      - ./:/app:z
+      - ./backend/app:/app:z
     environment:
-      - "USE_DOCKER=yes"
+      - USE_DOCKER=yes
+      - ALLOWED_ORIGINS=http://localhost:3000
+      - APP_VERSION=2.2.2
+    ports:
+      - "5000:80"
+
+  frontend_agenda:
+    build: ./frontend
+    image: frontend_agenda
+    container_name: frontend_agenda
+    volumes:
+      - ./frontend:/app:z
+    environment:
+      - USE_DOCKER=yes
     ports:
       - "3000:3000"
