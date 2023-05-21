@@ -14,23 +14,6 @@ def generate_uuid():
     return str(uuid.uuid4())
 
 
-class Appointment(Base):
-    __tablename__ = "appointments"
-
-    id = Column(String, primary_key=True, default=generate_uuid)
-    user_id = Column(Integer, ForeignKey("users.id"))
-    description = Column(String)
-    timestamp = Column(DateTime, default=datetime.utcnow())
-
-    def __init__(
-        self,
-        description: str,
-        timestamp: datetime = None,
-    ):
-        self.description = description
-        self.timestamp = timestamp or datetime.utcnow()
-
-
 class User(Base):
     __tablename__ = "users"
 
@@ -39,6 +22,7 @@ class User(Base):
     hashed_password = Column(String(128), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     last_login_at = Column(DateTime, default=None)
+    api_key = Column(String(36), unique=True, index=True, default=generate_uuid)
 
     appointments = relationship("Appointment", backref="user")
 
@@ -65,7 +49,7 @@ class User(Base):
         return db.query(cls).first() is not None
 
     @staticmethod
-    def create_user(db: Session, username: str, password: str):
+    def create(db: Session, username: str, password: str):
         hashed_password = get_password_hash(password)
         user = User(username=username, hashed_password=hashed_password)
         db.add(user)
@@ -93,7 +77,42 @@ def verify_password(password: str, hashed_password: str) -> bool:
 
 def create_initial_users(db: Session):
     if not User.exists(db):
-        User.create_user(db, username="user", password="user"),
+        User.create(db, username="user", password="user"),
         print("Initial users created.")
     else:
         print("There are users in the database, initial users not created.")
+
+
+class Appointment(Base):
+    __tablename__ = "appointments"
+
+    id = Column(String, primary_key=True, default=generate_uuid)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    description = Column(String)
+    appointment_datetime = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    def __init__(
+        self,
+        description: str,
+        appointment_datetime: datetime = None,
+    ):
+        self.description = description
+        self.appointment_datetime = appointment_datetime or datetime.utcnow()
+
+    @staticmethod
+    def create(
+        db: Session, user_id: int, description: str, appointment_datetime: datetime
+    ):
+        parsed_appointment_datetime = datetime.strptime(
+            appointment_datetime, "%Y-%m-%d %H:%M"
+        )
+
+        appointment = Appointment(
+            description=description, appointment_datetime=parsed_appointment_datetime
+        )
+        appointment.user_id = user_id
+        db.add(appointment)
+        db.commit()
+        db.refresh(appointment)
+        return appointment

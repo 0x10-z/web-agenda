@@ -5,6 +5,8 @@ services:
       dockerfile: Dockerfile
     image: iocio005/backend_agenda:latest
     container_name: backend_agenda
+    volumes:
+      - ./db:/app/db:z
     environment:
       - USE_DOCKER=yes
       - ALLOWED_ORIGINS=http://localhost:8080

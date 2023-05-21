@@ -12,6 +12,8 @@ services:
       - APP_VERSION=2.2.2
     ports:
       - "5000:80"
+      - "5678:5678" # debugpy
+    #command: "python -m debugpy --listen 0.0.0.0:5678 --wait-for-client /app/main.py --reload"
 
   frontend_agenda:
     build: ./frontend

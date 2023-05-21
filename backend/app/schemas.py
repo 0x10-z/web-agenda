@@ -8,7 +8,7 @@ from pydantic import BaseModel, validator
 class Appointment(BaseModel):
     id: Optional[str]
     description: str
-    timestamp: str
+    appointment_datetime: str
 
     @validator("id", pre=True, always=True)
     def default_id(cls, value):
@@ -21,3 +21,8 @@ class Appointment(BaseModel):
     class Config:
         use_enum_values = True
         orm_mode = True
+
+
+class Login(BaseModel):
+    username: str
+    password: str
