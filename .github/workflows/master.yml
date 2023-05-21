@@ -21,8 +21,8 @@ jobs:
       - name: Prepare env files
         run: |
           current_date=$(date +'%y.%m.%d-%H%M%S')
-          echo REACT_APP_API_URL=https://agenda-back.ikerocio.com/ > frontend/.env.local
-          echo REACT_APP_VERSION=$current_date > ./frontend/.env.local
+          echo REACT_APP_API_URL=https://agenda-back.ikerocio.com/ > ./frontend/.env.local
+          echo REACT_APP_VERSION=$current_date >> ./frontend/.env.local
           echo APP_VERSION=$current_date > ./backend/.env
 
       - name: Build and push Docker Compose
