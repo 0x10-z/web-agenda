@@ -50,7 +50,7 @@ export default function Body() {
   const formattedDate = selectedDate?.toISOString().substring(0, 10);
 
   return (
-    <div className="flex-grow">
+    <div className="flex-grow lg:mx-80">
       <div className="flex flex-col justify-around bg-white rounded-md m-10 h-full">
         <div className="flex flex-row">
           <div className="flex-1">

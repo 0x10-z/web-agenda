@@ -1,10 +1,14 @@
 import Navbar from "./Navbar";
 
-export default function PageHeader() {
+interface PageHeaderProps {
+  handleLogout: () => void;
+}
+
+export default function PageHeader({ handleLogout }: PageHeaderProps) {
   return (
     <section className="flex-none">
       <div className="mx-auto max-w-screen-xl py-2">
-        <Navbar />
+        <Navbar handleLogout={handleLogout} />
       </div>
     </section>
   );
