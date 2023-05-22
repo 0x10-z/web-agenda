@@ -10,6 +10,7 @@ from database import Base, SessionLocal, engine
 from models import create_initial_users
 from router import router
 from middleware import custom_csrf_middleware, db_session_middleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 app = FastAPI()
 
@@ -19,7 +20,7 @@ app.include_router(router)
 origins = os.getenv("ALLOWED_ORIGINS", "").split(",")
 print("ORIGINS: {}".format(origins))
 app.add_middleware(
-    CORSMiddleware,
+    TrustedHostMiddleware,
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
