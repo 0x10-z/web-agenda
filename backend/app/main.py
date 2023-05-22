@@ -8,16 +8,21 @@ from database import Base, SessionLocal, engine
 from models import create_initial_users
 from router import router
 from middleware import custom_csrf_middleware, db_session_middleware
-from starlette_csrf import CSRFMiddleware
+from starlette.middleware import Middleware
+from starlette.middleware.csrf import CSRFMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI()
+middleware = [
+    Middleware(CSRFMiddleware, secret="__CHANGE_ME__"),
+]
+
+app = FastAPI(middleware=middleware)
 
 # This must be before add_middleware
 app.include_router(router)
 
 origins = os.getenv("ALLOWED_ORIGINS", "").split(",")
 print("ORIGINS: {}".format(origins))
-app.add_middleware(CSRFMiddleware, secret="__CHANGE_ME__")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
