@@ -12,6 +12,9 @@ from middleware import custom_csrf_middleware, db_session_middleware
 
 app = FastAPI()
 
+# This must be before add_middleware
+app.include_router(router)
+
 origins = os.getenv("ALLOWED_ORIGINS", "").split(",")
 print("ORIGINS: {}".format(origins))
 app.add_middleware(
@@ -24,7 +27,6 @@ app.add_middleware(
 app.add_middleware(CSRFMiddleware, secret="__CHANGE_ME__")
 #app.middleware("http")(custom_csrf_middleware)
 app.middleware("http")(db_session_middleware)
-app.include_router(router)
 
 # @app.middleware("http")
 # async def db_session_middleware(request: Request, call_next):
