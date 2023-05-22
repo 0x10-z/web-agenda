@@ -2,8 +2,9 @@ import os
 
 import uvicorn
 from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
+#from fastapi.middleware.cors import CORSMiddleware
 from starlette_csrf import CSRFMiddleware
+from starlette.middleware.cors import CORSMiddleware
 
 from database import Base, SessionLocal, engine
 from models import create_initial_users
@@ -24,7 +25,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-#app.add_middleware(CSRFMiddleware, secret="__CHANGE_ME__")
+app.add_middleware(CSRFMiddleware, secret="__CHANGE_ME__")
 #app.middleware("http")(custom_csrf_middleware)
 app.middleware("http")(db_session_middleware)
 
