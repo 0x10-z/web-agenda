@@ -33,6 +33,44 @@ def version():
     return {"version": os.environ.get("APP_VERSION")}
 
 
+@router.put("/appointments/{id}")
+def appointments_update(
+    id: str,
+    updated_appointment: Appointment,
+    user: User = Depends(get_api_key),
+    db: Session = Depends(get_db),
+):
+    response = {"success": False}
+    if updated_appointment:
+        try:
+            ModelAppointment.update_appointment(db, id, updated_appointment, user.id)
+            response["success"] = True
+            response["appointments"] = ModelAppointment.get_all(db)
+        except HTTPException as e:
+            response["error"] = str(e.detail)
+    else:
+        response["error"] = "Invalid appointment data"
+    return response
+
+
+@router.delete("/appointments/{id}")
+def appointments_update(
+    id: str,
+    user: User = Depends(get_api_key),
+    db: Session = Depends(get_db),
+):
+    response = {"success": False}
+    if id:
+        try:
+            response["success"] = ModelAppointment.delete_appointment(db, id, user.id)
+            response["appointments"] = ModelAppointment.get_all(db)
+        except HTTPException as e:
+            response["error"] = str(e.detail)
+    else:
+        response["error"] = "Invalid appointment data"
+    return response
+
+
 @router.post("/appointments")
 def appointments_post(
     new_appointment: Appointment,

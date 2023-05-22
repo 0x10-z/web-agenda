@@ -6,6 +6,7 @@ from datetime import datetime
 from typing import List
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, func
 from sqlalchemy.orm import Session, relationship
+from fastapi import HTTPException
 
 from database import Base
 
@@ -100,13 +101,6 @@ class Appointment(Base):
         self.description = description
         self.appointment_datetime = appointment_datetime or datetime.utcnow()
 
-    def __iter__(self):
-        yield self.id
-        yield self.description
-        yield self.appointment_datetime
-        yield self.user_id
-        yield self.created_at
-
     @classmethod
     def create(
         cls, db: Session, user_id: int, description: str, appointment_datetime: datetime
@@ -123,6 +117,41 @@ class Appointment(Base):
         db.commit()
         db.refresh(appointment)
         return appointment
+
+    @classmethod
+    def get_by_id(cls, db: Session, id: int) -> "Appointment":
+        return db.query(cls).filter(cls.id == id).first()
+
+    @classmethod
+    def delete_appointment(cls, db, id, user_id):
+        appointment = db.query(cls).filter_by(id=id, user_id=user_id).first()
+        if appointment:
+            db.delete(appointment)
+            db.commit()
+            return True
+        return False
+
+    @classmethod
+    def update_appointment(
+        cls,
+        db: Session,
+        appointment_id: str,
+        updated_appointment: "Appointment",
+        user_id: int,
+    ) -> bool:
+        appointment = cls.get_by_id(db, appointment_id)
+        if appointment:
+            if appointment.user_id == user_id:
+                appointment.description = updated_appointment.description
+                appointment.appointment_datetime = datetime.strptime(
+                    updated_appointment.appointment_datetime, "%Y-%m-%d %H:%M"
+                )
+                db.commit()
+                return True
+            else:
+                raise HTTPException(status_code=403, detail="Unauthorized")
+        else:
+            raise HTTPException(status_code=404, detail="Appointment not found")
 
     @classmethod
     def get_by_date(cls, db: Session, date: str, user_id: int) -> List["Appointment"]:
