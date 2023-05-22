@@ -21,10 +21,7 @@ origins = os.getenv("ALLOWED_ORIGINS", "").split(",")
 print("ORIGINS: {}".format(origins))
 app.add_middleware(
     TrustedHostMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allowed_hosts=origins
 )
 app.add_middleware(CSRFMiddleware, secret="__CHANGE_ME__")
 #app.middleware("http")(custom_csrf_middleware)
