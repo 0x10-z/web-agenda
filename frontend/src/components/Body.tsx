@@ -4,10 +4,22 @@ import "react-calendar/dist/Calendar.css";
 import { Modal } from "./Modal";
 import { showErrorToast } from "../utils/util";
 import React from "react";
+import { User } from "models/User";
+import { Appointment } from "models/Appointment";
+import { Tooltip } from "react-tooltip";
 
-export default function Body() {
-  const [selectedDate, setSelectedDate] = useState<Date>();
+interface BodyProps {
+  user: User;
+}
+
+export default function Body({ user }: BodyProps) {
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [modalOpen, setModalOpen] = useState(false);
+  const [eventList, setEventList] = useState<Appointment[]>([]);
+
+  useEffect(() => {
+    fetchEvents(selectedDate);
+  }, []);
 
   const handleOpenModal = () => {
     setModalOpen(true);
@@ -17,18 +29,59 @@ export default function Body() {
     setModalOpen(false);
   };
 
+  const fetchEvents = async (date: Date) => {
+    const formattedDate = date.toISOString().substring(0, 10);
+    try {
+      const response = await fetch(
+        `http://localhost:5000/appointments?date=${formattedDate}`,
+        {
+          headers: {
+            Authorization: `Bearer ${user.api_key}`,
+          },
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        console.log(data.appointments);
+
+        setEventList(
+          data.appointments.map(
+            (appointment: any) =>
+              new Appointment(
+                appointment.id,
+                appointment.description,
+                appointment.appointment_datetime,
+                appointment.user_id,
+                appointment.created_at
+              )
+          )
+        );
+      } else {
+        showErrorToast("Error al obtener la lista de eventos");
+      }
+    } catch (error) {
+      showErrorToast("Error al obtener la lista de eventos: " + error);
+    }
+  };
+
   const handleAcceptModal = async (data: FormData) => {
     const formDataObj = Object.fromEntries(data.entries());
     const jsonData = JSON.stringify(formDataObj);
 
     try {
-      const response = await fetch("api/appointments", {
+      const response = await fetch("http://localhost:5000/appointments", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.api_key}`,
+        },
         body: jsonData,
       });
 
       if (response.ok) {
+        //const data = await response.json();
+        //setEventList(data.appointments);
+        fetchEvents(selectedDate!);
         showErrorToast("El formulario se ha enviado correctamente");
       } else {
         showErrorToast("Error al enviar el formulario");
@@ -38,14 +91,22 @@ export default function Body() {
     }
   };
 
-  const handleDateChange = (event: any) => {
+  const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedDate = new Date(event.target.value);
-    setSelectedDate(selectedDate);
+    const localDate = new Date(
+      selectedDate.getTime() - selectedDate.getTimezoneOffset() * 60000
+    );
+    setSelectedDate(localDate);
+    fetchEvents(localDate);
   };
 
-  useEffect(() => {
-    setSelectedDate(new Date());
-  }, []);
+  const handleDayClick = (date: Date) => {
+    const localDate = new Date(
+      date.getTime() - date.getTimezoneOffset() * 60000
+    );
+    setSelectedDate(localDate);
+    fetchEvents(localDate);
+  };
 
   const formattedDate = selectedDate?.toISOString().substring(0, 10);
 
@@ -56,28 +117,55 @@ export default function Body() {
           <div className="flex-1">
             <div
               id="left-sidebar"
-              className="flex flex-col h-full overflow-hidden p-10"
+              className="flex flex-col h-full overflow-hidden p-4"
             >
+              <div className="flex justify-center pb-4">
+                <h1 className="font-bold pb-2 text-2xl text-gray-800">
+                  {getDateTitle(selectedDate)}
+                </h1>
+              </div>
               <input
                 type="date"
-                className="flex mb-4 p-2 border border-gray-300 rounded"
+                className="sm:flex md:hidden lg:hidden mb-4 p-2 border border-gray-300 rounded"
                 value={formattedDate}
                 onChange={handleDateChange}
               />
-              <ul className="flex-1 flex flex-col justify-center">
-                <li>aitor</li>
-                <li>iker</li>
+              <ul className="flex-1 flex flex-col justify-start max-h-[500px] overflow-y-auto">
+                {eventList &&
+                  eventList.map((event: Appointment, index) => (
+                    <li
+                      key={index}
+                      data-tooltip-id="tooltip"
+                      data-tooltip-content={`Creado el ${event.createdAtTime()}`}
+                      className={`rounded p-2 hover:bg-gray-700 hover:text-white hover:cursor-pointer ${
+                        index % 2 === 0 ? "bg-white" : "bg-gray-200"
+                      }`}
+                    >
+                      {index + 1} - {event.description} - {event.localeTime()}
+                    </li>
+                  ))}
+                <Tooltip
+                  id={`tooltip`}
+                  place="right"
+                  style={{ backgroundColor: "black" }}
+                />
               </ul>
             </div>
           </div>
           <div
             id="right-sidebar"
-            className="hidden md:flex md:flex-1 p-4 flex-col justify-center items-center bg-red-800"
+            className="hidden md:flex md:flex-1 p-4 flex-col justify-center items-center dbg-red-200"
           >
+            <input
+              type="date"
+              className="flex mb-4 p-2 border border-gray-300 rounded"
+              value={formattedDate}
+              onChange={handleDateChange}
+            />
             <Calendar
               className="w-full mb-4"
               value={selectedDate}
-              onClickDay={setSelectedDate}
+              onClickDay={handleDayClick}
               locale="es-ES"
             />
             <img
@@ -110,4 +198,13 @@ export default function Body() {
       </div>
     </div>
   );
+}
+
+function getDateTitle(date: Date) {
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  };
+  return date.toLocaleDateString("es-ES", options);
 }

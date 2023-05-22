@@ -3,7 +3,7 @@ import hashlib
 import os
 import uuid
 from datetime import datetime
-
+from typing import List
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, func
 from sqlalchemy.orm import Session, relationship
 
@@ -100,9 +100,16 @@ class Appointment(Base):
         self.description = description
         self.appointment_datetime = appointment_datetime or datetime.utcnow()
 
-    @staticmethod
+    def __iter__(self):
+        yield self.id
+        yield self.description
+        yield self.appointment_datetime
+        yield self.user_id
+        yield self.created_at
+
+    @classmethod
     def create(
-        db: Session, user_id: int, description: str, appointment_datetime: datetime
+        cls, db: Session, user_id: int, description: str, appointment_datetime: datetime
     ):
         parsed_appointment_datetime = datetime.strptime(
             appointment_datetime, "%Y-%m-%d %H:%M"
@@ -116,3 +123,18 @@ class Appointment(Base):
         db.commit()
         db.refresh(appointment)
         return appointment
+
+    @classmethod
+    def get_by_date(cls, db: Session, date: str, user_id: int) -> List["Appointment"]:
+        appointments_query = db.query(Appointment).filter_by(user_id=user_id)
+        appointments_query = appointments_query.filter(
+            func.date(Appointment.appointment_datetime) == date
+        )
+        appointments_query = appointments_query.order_by(
+            func.time(Appointment.appointment_datetime)
+        )
+        return appointments_query.all()
+
+    @classmethod
+    def get_all(cls, db: Session) -> List["Appointment"]:
+        return db.query(cls).all()

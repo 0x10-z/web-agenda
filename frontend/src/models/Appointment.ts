@@ -1,38 +1,45 @@
+import { interactive } from "@material-tailwind/react/types/components/popover";
+
 export interface AppointmentProps {
   id: string;
   description: string;
-  datetime: Date;
+  appointment_datetime: Date;
   created_at: Date;
 }
 
 export class Appointment {
   id: string;
   description: string;
-  datetime: Date;
+  appointment_datetime: Date;
+  user_id: number;
+  created_at: Date;
 
-  constructor(id: string, description: string, datetime: Date) {
+  constructor(id: string, description: string, appointment_datetime: string, user_id: number, created_at: string) {
     this.id = id;
     this.description = description;
-    this.datetime = datetime;
+    this.appointment_datetime = new Date(appointment_datetime);
+    this.user_id = user_id;
+    this.created_at = new Date(created_at);
   }
 
-  static create(description: string, datetime: Date): Appointment {
-    const id = generateGUID();
-    return new Appointment(id, description, datetime);
-  }
-}
+  localeTime(){
+    const options: Intl.DateTimeFormatOptions = {
+      hour: '2-digit',
+      minute: '2-digit',
+    };
 
-/* eslint-disable no-mixed-operators */
-
-function generateGUID() {
-  var d = new Date().getTime();
-  if (typeof performance !== 'undefined' && typeof performance.now === 'function'){
-    d += performance.now();
+    return this.appointment_datetime.toLocaleString([], options);
   }
-  var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    var r = (d + Math.random()*16)%16 | 0;
-    d = Math.floor(d/16);
-    return (c==='x' ? r : (r&0x3|0x8)).toString(16);
-  });
-  return uuid;
+
+  createdAtTime(){
+    const options: Intl.DateTimeFormatOptions = {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    };
+
+    return this.created_at.toLocaleString([], options);
+  }
 }

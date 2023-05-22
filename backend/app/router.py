@@ -49,6 +49,7 @@ def appointments_post(
         )
         if appointment:
             response["success"] = True
+            response["appointments"] = ModelAppointment.get_all(db)
     else:
         response["error"] = "Message field is mandatory"
     return response
@@ -71,13 +72,14 @@ def appointments_get(
             appointments_query = appointments_query.filter(
                 func.date(ModelAppointment.appointment_datetime) == filter_date
             )
+            # response["appointments"] = appointments_query.all()
+
+            response["appointments"] = ModelAppointment.get_by_date(db, date, user.id)
         except ValueError:
             raise HTTPException(
                 status_code=400,
                 detail="Fecha proporcionada en formato incorrecto. Debe ser 'YYYY-MM-DD'",
             )
-
-    response["appointments"] = appointments_query.all()
 
     return response
 

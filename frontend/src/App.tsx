@@ -39,7 +39,7 @@ function App() {
       {user ? (
         <>
           <PageHeader handleLogout={handleLogout} />
-          <Body />
+          <Body user={user} />
           <Footer />
           <ToastContainer />
         </>

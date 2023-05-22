@@ -11,14 +11,12 @@ export interface UserProps {
 export class User {
   id: number;
   api_key: string;
-  created_at: Date;
   username: string;
   appointments: Appointment[]
 
-  constructor(id: number, api_key: string, created_at: Date, username: string, appointments: Appointment[]) {
+  constructor(id: number, api_key: string, username: string, appointments: Appointment[]) {
     this.id = id;
     this.api_key = api_key;
-    this.created_at = created_at;
     this.username = username;
     this.appointments = appointments;
   }
