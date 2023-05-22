@@ -1,13 +1,14 @@
 import os
 
 import uvicorn
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import Base, SessionLocal, engine
 from models import create_initial_users
 from router import router
 from middleware import custom_csrf_middleware, db_session_middleware
+from starlette_csrf import CSRFMiddleware
 
 app = FastAPI()
 
@@ -23,10 +24,20 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-#app.add_middleware(CSRFMiddleware, secret="__CHANGE_ME__")
+app.add_middleware(CSRFMiddleware, secret="__CHANGE_ME__")
 #app.middleware("http")(custom_csrf_middleware)
 app.middleware("http")(db_session_middleware)
 
+from starlette.requests import Request
+from starlette.responses import JSONResponse, Response
+from starlette_csrf import CSRFMiddleware
+
+class CustomResponseCSRFMiddleware(CSRFMiddleware):
+    def _get_error_response(self, request: Request) -> Response:
+        return JSONResponse(
+            content={"code": "CSRF_ERROR"}, status_code=403
+        )
+    
 # @app.middleware("http")
 # async def db_session_middleware(request: Request, call_next):
 #     response = JSONResponse({"message": "Internal server error"}, status_code=500)
