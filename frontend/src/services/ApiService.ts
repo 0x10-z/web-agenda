@@ -85,7 +85,7 @@ export class ApiService{
     const jsonData = JSON.stringify(formDataObj);
 
     try {
-      const response = await this.fetchJson(url, {
+      const response = await this.fetchJson(this.baseUrl + url, {
         method,
         headers: {
           "Content-Type": "application/json",

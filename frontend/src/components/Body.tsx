@@ -57,11 +57,7 @@ export default function Body({ user }: BodyProps) {
   };
 
   const handleCreateAppointment = async (data: FormData) => {
-    await apiService.submitFormData(
-      data,
-      "http://localhost:5000/appointments/",
-      "POST"
-    );
+    await apiService.submitFormData(data, "appointments/", "POST");
     fetchEvents(selectedDate!);
   };
 
@@ -70,7 +66,7 @@ export default function Body({ user }: BodyProps) {
     const appointmentId = formDataObj.id;
     await apiService.submitFormData(
       data,
-      `http://localhost:5000/appointments/${appointmentId}`,
+      `appointments/${appointmentId}`,
       "PUT"
     );
     fetchEvents(selectedDate!);
