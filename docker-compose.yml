@@ -24,4 +24,4 @@ services:
     environment:
       - USE_DOCKER=yes
     ports:
-      - "3000:3000"
+      - "3003:3000"

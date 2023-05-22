@@ -8,6 +8,8 @@
 
 ```sh
 current_date=$(date +'%y.%m.%d-%H%M%S')
-echo NEXT_PUBLIC_APP_VERSION=$current_date > .env.local
+echo REACT_APP_API_URL=http://localhost:5000/ > ./frontend/.env.local
+echo REACT_APP_VERSION=$current_date >> ./frontend/.env.local
+echo APP_VERSION=$current_date > ./backend/.env
 docker-compose up
 ```
