@@ -15,7 +15,6 @@ interface BodyProps {
 export default function Body({ user }: BodyProps) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [modalOpen, setModalOpen] = useState(false);
-  const [modifyableModalOpen, setModifyableModalOpen] = useState(false);
   const [eventList, setEventList] = useState<Appointment[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Appointment | null>(null);
 
@@ -28,6 +27,7 @@ export default function Body({ user }: BodyProps) {
   };
 
   const handleCloseModal = () => {
+    setSelectedEvent(null);
     setModalOpen(false);
   };
 
@@ -91,11 +91,7 @@ export default function Body({ user }: BodyProps) {
 
   const handleOpenModalToModifyAnElement = (event: Appointment) => {
     setSelectedEvent(event);
-    setModifyableModalOpen(true);
-  };
-
-  const handleCloseModalToModifyAnElement = () => {
-    setModifyableModalOpen(false);
+    setModalOpen(true);
   };
 
   const fetchEvents = async (date: Date) => {
@@ -134,8 +130,6 @@ export default function Body({ user }: BodyProps) {
   };
 
   const handleOnDelete = async (appointment_id: string) => {
-    setModifyableModalOpen(false);
-
     try {
       const response = await fetch(
         `http://localhost:5000/appointments/${appointment_id}`,
@@ -249,30 +243,26 @@ export default function Body({ user }: BodyProps) {
           >
             Añadir
           </button>
-          <button className="flex-1 bg-green-500 hover:bg-green-700 text-white py-2 px-4 m-2 rounded">
-            Modificar
-          </button>
-          <button className="flex-1 bg-red-500 hover:bg-red-700 text-white py-2 px-4 m-2 rounded">
-            Eliminar
-          </button>
         </div>
-        <Modal
-          title="Crear"
-          isOpen={modalOpen}
-          onClose={handleCloseModal}
-          onAccept={handleAcceptModal}
-          onDelete={undefined}
-          appointment={null}
-        />
-
-        <Modal
-          title="Actualizar"
-          isOpen={modifyableModalOpen}
-          onClose={handleCloseModalToModifyAnElement}
-          onAccept={handleAcceptModalToModifyAnElement}
-          onDelete={handleOnDelete}
-          appointment={selectedEvent}
-        />
+        {selectedEvent ? (
+          <Modal
+            title="Actualizar"
+            isOpen={modalOpen}
+            onClose={handleCloseModal}
+            onAccept={handleAcceptModalToModifyAnElement}
+            onDelete={handleOnDelete}
+            appointment={selectedEvent}
+          />
+        ) : (
+          <Modal
+            title="Crear"
+            isOpen={modalOpen}
+            onClose={handleCloseModal}
+            onAccept={handleAcceptModal}
+            onDelete={null}
+            appointment={null}
+          />
+        )}
       </div>
     </div>
   );

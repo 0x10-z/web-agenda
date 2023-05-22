@@ -10,7 +10,7 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAccept: (data: FormData) => void;
-  onDelete: ((appointment_id: string) => Promise<void>) | undefined;
+  onDelete: ((appointment_id: string) => Promise<void>) | null;
   appointment: Appointment | null;
 }
 
@@ -19,7 +19,7 @@ export const Modal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
   onAccept,
-  onDelete = undefined,
+  onDelete = null,
   appointment = null,
 }) => {
   const [time, setTime] = useState<string>(
@@ -73,7 +73,7 @@ export const Modal: React.FC<ModalProps> = ({
     const currentDateTime = new Date();
     const selectedDateTime = getSelectedDateTime(selectedDate, time);
 
-    if (selectedDateTime <= currentDateTime) {
+    if (!appointment && selectedDateTime <= currentDateTime) {
       showErrorToast("La cita debe ser posterior al momento actual.");
       return;
     }
