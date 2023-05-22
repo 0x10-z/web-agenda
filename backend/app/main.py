@@ -23,7 +23,6 @@ app.include_router(router)
 
 origins = os.getenv("ALLOWED_ORIGINS", "").split(",")
 print("ORIGINS: {}".format(origins))
-app.add_middleware(CSRFMiddleware, secret="__CHANGE_ME__")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
