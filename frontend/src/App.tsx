@@ -4,12 +4,9 @@ import PageHeader from "./components/PageHeader";
 import Footer from "./components/Footer";
 import Body from "./components/Body";
 import { ToastContainer } from "react-toastify";
-import { ApiService } from "services/ApiService";
 import { User } from "./models/User";
 import { Auth } from "./utils/auth";
 import LoginForm from "./pages/Login";
-
-const apiService = new ApiService();
 
 function App() {
   const [user, setUser] = useState<User | null>(null);

@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { ApiService } from "services/ApiService";
-import { showErrorToast } from "utils/util";
+import { showToast } from "utils/util";
 import { User } from "models/User";
 import Footer from "components/Footer";
-
-const apiService = new ApiService();
 
 interface LoginProps {
   onLoginSuccess: (user: User) => void;
@@ -17,11 +15,14 @@ function LoginForm({ onLoginSuccess }: LoginProps) {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     try {
-      const user = await apiService.login(username, password);
+      const user = await ApiService.login(username, password);
       if (user) {
         onLoginSuccess(user);
       } else {
-        showErrorToast("El nombre de usuario o contraseña son incorrectos.");
+        showToast(
+          "El nombre de usuario o contraseña son incorrectos.",
+          "error"
+        );
       }
     } catch (error: any) {
       alert(`Ocurrió un error: ${error.message}`);

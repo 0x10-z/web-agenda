@@ -5,7 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import {
   getSelectedDateTime,
   getSelectedDateTimeString,
-  showErrorToast,
+  showToast,
 } from "../utils/util";
 import { Appointment } from "models/Appointment";
 
@@ -78,12 +78,12 @@ export const Modal: React.FC<ModalProps> = ({
     const selectedDateTime = getSelectedDateTime(selectedDate, time);
 
     if (!appointment && selectedDateTime <= currentDateTime) {
-      showErrorToast("La cita debe ser posterior al momento actual.");
+      showToast("La cita debe ser posterior al momento actual.", "info");
       return;
     }
 
     if (description === "") {
-      showErrorToast("La cita debe contener una descripción");
+      showToast("La cita debe contener una descripción", "info");
       return;
     }
 

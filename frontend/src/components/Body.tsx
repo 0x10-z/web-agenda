@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { Modal } from "./Modal";
-import { showErrorToast } from "../utils/util";
 import React from "react";
 import { User } from "models/User";
 import { Appointment } from "models/Appointment";
 import { Tooltip } from "react-tooltip";
+import { ApiService } from "services/ApiService";
 
 interface BodyProps {
   user: User;
@@ -14,140 +14,57 @@ interface BodyProps {
 
 export default function Body({ user }: BodyProps) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [modalOpen, setModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [eventList, setEventList] = useState<Appointment[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Appointment | null>(null);
+
+  const apiService = new ApiService(user);
 
   useEffect(() => {
     fetchEvents(selectedDate);
   }, []);
 
-  const handleOpenModal = () => {
-    setModalOpen(true);
+  const handleOpenModal = (
+    event?: React.MouseEvent<HTMLButtonElement> | Appointment
+  ) => {
+    setSelectedEvent(event instanceof Appointment ? event : null);
+    setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setSelectedEvent(null);
-    setModalOpen(false);
+    setIsModalOpen(false);
   };
 
-  // CREATE
-  const handleAcceptModal = async (data: FormData) => {
+  const handleCreateAppointment = async (data: FormData) => {
+    await apiService.submitFormData(
+      data,
+      "http://localhost:5000/appointments/",
+      "POST"
+    );
+    fetchEvents(selectedDate!);
+  };
+
+  const handleUpdateAppointment = async (data: FormData) => {
     const formDataObj = Object.fromEntries(data.entries());
-    const jsonData = JSON.stringify(formDataObj);
-
-    try {
-      const response = await fetch("http://localhost:5000/appointments", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.api_key}`,
-        },
-        body: jsonData,
-      });
-
-      if (response.ok) {
-        //const data = await response.json();
-        //setEventList(data.appointments);
-        fetchEvents(selectedDate!);
-        showErrorToast("El formulario se ha enviado correctamente");
-      } else {
-        showErrorToast("Error al enviar el formulario");
-      }
-    } catch (error) {
-      showErrorToast("Error al enviar el formulario:" + error);
-    }
-  };
-
-  // UPDATE
-  const handleAcceptModalToModifyAnElement = async (data: FormData) => {
-    const formDataObj = Object.fromEntries(data.entries());
-    const jsonData = JSON.stringify(formDataObj);
-    try {
-      const response = await fetch(
-        "http://localhost:5000/appointments/" + formDataObj.id,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${user.api_key}`,
-          },
-          body: jsonData,
-        }
-      );
-
-      if (response.ok) {
-        //const data = await response.json();
-        //setEventList(data.appointments);
-        fetchEvents(selectedDate!);
-        showErrorToast("El formulario se ha enviado correctamente");
-      } else {
-        showErrorToast("Error al enviar el formulario");
-      }
-    } catch (error) {
-      showErrorToast("Error al enviar el formulario:" + error);
-    }
-  };
-
-  const handleOpenModalToModifyAnElement = (event: Appointment) => {
-    setSelectedEvent(event);
-    setModalOpen(true);
+    const appointmentId = formDataObj.id;
+    await apiService.submitFormData(
+      data,
+      `http://localhost:5000/appointments/${appointmentId}`,
+      "PUT"
+    );
+    fetchEvents(selectedDate!);
   };
 
   const fetchEvents = async (date: Date) => {
-    const formattedDate = date.toISOString().substring(0, 10);
-    try {
-      const response = await fetch(
-        `http://localhost:5000/appointments?date=${formattedDate}`,
-        {
-          headers: {
-            Authorization: `Bearer ${user.api_key}`,
-          },
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data.appointments);
-
-        setEventList(
-          data.appointments.map(
-            (appointment: any) =>
-              new Appointment(
-                appointment.id,
-                appointment.description,
-                appointment.appointment_datetime,
-                appointment.user_id,
-                appointment.created_at
-              )
-          )
-        );
-      } else {
-        showErrorToast("Error al obtener la lista de eventos");
-      }
-    } catch (error) {
-      showErrorToast("Error al obtener la lista de eventos: " + error);
-    }
+    const appointments = await apiService.fetchEvents(date);
+    setEventList(appointments);
   };
 
   const handleOnDelete = async (appointment_id: string) => {
-    try {
-      const response = await fetch(
-        `http://localhost:5000/appointments/${appointment_id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${user.api_key}`,
-          },
-        }
-      );
-      if (response.ok) {
-        fetchEvents(selectedDate!);
-      } else {
-        showErrorToast("Error al obtener la lista de eventos");
-      }
-    } catch (error) {
-      showErrorToast("Error al obtener la lista de eventos: " + error);
-    }
+    await apiService.deleteAppointment(appointment_id);
+    fetchEvents(selectedDate!);
+    setIsModalOpen(false);
   };
 
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -166,9 +83,18 @@ export default function Body({ user }: BodyProps) {
     setSelectedDate(localDate);
     fetchEvents(localDate);
   };
-
   const formattedDate = selectedDate?.toISOString().substring(0, 10);
 
+  const modalTitle = selectedEvent ? "Actualizar" : "Crear";
+  const modalProps = selectedEvent
+    ? {
+        onAccept: handleUpdateAppointment,
+        onDelete: handleOnDelete,
+        appointment: selectedEvent,
+      }
+    : {
+        onAccept: handleCreateAppointment,
+      };
   return (
     <div className="flex-grow lg:mx-80">
       <div className="flex flex-col justify-around bg-white rounded-md m-10 h-full">
@@ -193,10 +119,10 @@ export default function Body({ user }: BodyProps) {
                 {eventList &&
                   eventList.map((event: Appointment, index) => (
                     <li
-                      key={index}
+                      key={event.id}
                       data-tooltip-id="tooltip"
                       data-tooltip-content={`Creado el ${event.createdAtTime()}`}
-                      onClick={() => handleOpenModalToModifyAnElement(event)}
+                      onClick={() => handleOpenModal(event)}
                       className={`rounded p-2 hover:bg-gray-700 hover:text-white hover:cursor-pointer ${
                         index % 2 === 0 ? "bg-white" : "bg-gray-200"
                       }`}
@@ -244,23 +170,12 @@ export default function Body({ user }: BodyProps) {
             Añadir
           </button>
         </div>
-        {selectedEvent ? (
-          <Modal
-            title="Actualizar"
-            isOpen={modalOpen}
-            onClose={handleCloseModal}
-            onAccept={handleAcceptModalToModifyAnElement}
-            onDelete={handleOnDelete}
-            appointment={selectedEvent}
-          />
-        ) : (
-          <Modal
-            title="Crear"
-            isOpen={modalOpen}
-            onClose={handleCloseModal}
-            onAccept={handleAcceptModal}
-          />
-        )}
+        <Modal
+          title={modalTitle}
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          {...modalProps}
+        />
       </div>
     </div>
   );

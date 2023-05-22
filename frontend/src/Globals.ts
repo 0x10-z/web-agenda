@@ -6,7 +6,7 @@ export class Globals {
   static FRONTEND_VERSION = packageJson.version || "Version Not Found";
 
   static async getBackendVersion() {
-    const backendVersion = await (new ApiService()).getBackendVersion() || "Version Not Found";
+    const backendVersion = await ApiService.getBackendVersion() || "Version Not Found";
     return backendVersion;
   }
 }
