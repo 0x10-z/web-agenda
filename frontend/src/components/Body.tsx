@@ -7,6 +7,13 @@ import { User } from "models/User";
 import { Appointment } from "models/Appointment";
 import { Tooltip } from "react-tooltip";
 import { ApiService } from "services/ApiService";
+import { getCurrentIsoDate } from "utils/util";
+
+interface MonthlyAppointmentsProps {
+  day: number;
+  month: number;
+  appointments: number;
+}
 
 interface BodyProps {
   user: User;
@@ -17,8 +24,21 @@ export default function Body({ user }: BodyProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [eventList, setEventList] = useState<Appointment[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Appointment | null>(null);
+  const [monthlyEvents, setMonthlyEvents] =
+    useState<MonthlyAppointmentsProps[]>();
 
   const apiService = new ApiService(user);
+
+  useEffect(() => {
+    const fetchMonthlyAppointments = async () => {
+      const appointments = await apiService.fetchAppointmentsByMonth(
+        selectedDate
+      );
+      setMonthlyEvents(appointments);
+    };
+
+    fetchMonthlyAppointments();
+  }, []);
 
   useEffect(() => {
     fetchEvents(selectedDate);
@@ -83,7 +103,29 @@ export default function Body({ user }: BodyProps) {
     setSelectedDate(localDate);
     fetchEvents(localDate);
   };
-  const formattedDate = selectedDate?.toISOString().substring(0, 10);
+
+  const daysWithAppointments = ({
+    date,
+    view,
+  }: {
+    date: Date;
+    view: string;
+  }) => {
+    if (view === "month" && monthlyEvents) {
+      const dayOfMonth = date.getDate();
+      const month = date.getMonth();
+      const foundAppointment = monthlyEvents.find(
+        (appointment) =>
+          appointment.day === dayOfMonth && appointment.month == month + 1
+      );
+
+      if (foundAppointment && foundAppointment.appointments > 0) {
+        return "🕮";
+      }
+    }
+  };
+
+  const formattedDate = getCurrentIsoDate(selectedDate).substring(0, 10);
 
   const modalTitle = selectedEvent ? "Actualizar" : "Crear";
   const modalProps = selectedEvent
@@ -96,7 +138,7 @@ export default function Body({ user }: BodyProps) {
         onAccept: handleCreateAppointment,
       };
   return (
-    <div className="flex-grow lg:mx-80">
+    <div className="flex-grow md:mx-10 lg:mx-40 xl:mx-80">
       <div className="flex flex-col justify-around bg-white rounded-md m-10 h-full">
         <div className="flex flex-row">
           <div className="flex-1">
@@ -152,6 +194,8 @@ export default function Body({ user }: BodyProps) {
               className="w-full mb-4"
               value={selectedDate}
               onClickDay={handleDayClick}
+              showWeekNumbers={true}
+              tileContent={daysWithAppointments}
               locale="es-ES"
             />
             <img

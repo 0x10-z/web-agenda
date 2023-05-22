@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, Query, Path
 from sqlalchemy.orm import Session
 import os
 from dependencies import get_api_key, get_db
@@ -120,6 +120,43 @@ def appointments_get(
             )
 
     return response
+
+
+import calendar
+from datetime import timedelta
+
+
+def get_month_appointments(month: int, year: int, user, db):
+    appointments_by_day = []
+
+    _, num_days = calendar.monthrange(year, month)
+    start_date = datetime(year, month, 1).date()
+
+    for day in range(1, num_days + 1):
+        current_date = start_date + timedelta(days=day - 1)
+        appointments_count = ModelAppointment.get_by_date(db, current_date, user.id)
+        appointments_by_day.append(
+            {"month": month, "day": day, "appointments": len(appointments_count)}
+        )
+
+    return appointments_by_day
+
+
+@router.get("/appointments/monthly/{year}/{month}")
+def get_monthly_appointments(
+    year: int,
+    month: int,
+    user: User = Depends(get_api_key),
+    db: Session = Depends(get_db),
+):
+    print("{}/{}".format(year, month))
+    if not (1 <= month <= 12):
+        raise HTTPException(
+            status_code=400, detail="Mes inválido. Debe estar entre 1 y 12."
+        )
+
+    appointments_by_day = get_month_appointments(month, year, user, db)
+    return appointments_by_day
 
 
 @router.get("/")

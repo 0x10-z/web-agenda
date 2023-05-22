@@ -10,6 +10,19 @@ export const showToast = (message: string, type: "error" | "info" | "success") =
 };
 
 
+export const getCurrentIsoDate = (date: Date | null = null) => {
+  if (!date){
+    date = new Date();
+  }
+
+  const year = date.getFullYear();
+const month = String(date.getMonth() + 1).padStart(2, '0');
+const day = String(date.getDate()).padStart(2, '0');
+
+const formattedDate = `${year}-${month}-${day}`;
+return formattedDate;
+}
+
 
 export const getSelectedDateTime = (currentDate: Date, currentTime: string) => {
   return new Date(

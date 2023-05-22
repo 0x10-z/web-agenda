@@ -3,6 +3,7 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "react-toastify/dist/ReactToastify.css";
 import {
+  getCurrentIsoDate,
   getSelectedDateTime,
   getSelectedDateTimeString,
   showToast,
@@ -31,7 +32,7 @@ export const Modal: React.FC<ModalProps> = ({
   );
   const [description, setDescription] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const formattedDate = selectedDate?.toISOString().substring(0, 10);
+  const formattedDate = getCurrentIsoDate(selectedDate).substring(0, 10);
 
   useEffect(() => {
     if (appointment) {

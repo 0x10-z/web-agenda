@@ -1,6 +1,6 @@
 import { Appointment } from "models/Appointment";
 import { User } from "models/User";
-import { getSelectedDateTimeFormattedString, showToast } from "utils/util";
+import { getCurrentIsoDate, getSelectedDateTimeFormattedString, showToast } from "utils/util";
 import { Globals } from "Globals";
 import { toast } from "react-toastify";
 
@@ -26,8 +26,32 @@ export class ApiService{
     }
   }
 
+  async fetchAppointmentsByMonth(date: Date): Promise<[]> {
+    try {
+      const year = getCurrentIsoDate(date).substring(0, 4);
+      const month = getCurrentIsoDate(date).substring(5, 7);
+      const url = `${this.baseUrl}appointments/monthly/${year}/${month}`;
+  
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${this.user.api_key}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        return data;
+      } else {
+        throw new Error("Request failed");
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return [];
+    }
+  };
+
   async fetchEvents(date: Date): Promise<Appointment[]> {
-    const formattedDate = date.toISOString().substring(0, 10);
+    const today = getCurrentIsoDate(date);
+    const formattedDate = today.substring(0, 10);
     const url = `${this.baseUrl}appointments?date=${formattedDate}`;
 
     try {
