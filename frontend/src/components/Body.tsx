@@ -259,8 +259,6 @@ export default function Body({ user }: BodyProps) {
             isOpen={modalOpen}
             onClose={handleCloseModal}
             onAccept={handleAcceptModal}
-            onDelete={null}
-            appointment={null}
           />
         )}
       </div>

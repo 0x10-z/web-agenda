@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "react-toastify/dist/ReactToastify.css";
-import { showErrorToast } from "../utils/util";
+import {
+  getSelectedDateTime,
+  getSelectedDateTimeString,
+  showErrorToast,
+} from "../utils/util";
 import { Appointment } from "models/Appointment";
 
 interface ModalProps {
@@ -10,8 +14,8 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAccept: (data: FormData) => void;
-  onDelete: ((appointment_id: string) => Promise<void>) | null;
-  appointment: Appointment | null;
+  onDelete?: (appointment_id: string) => Promise<void>;
+  appointment?: Appointment;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -19,13 +23,13 @@ export const Modal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
   onAccept,
-  onDelete = null,
-  appointment = null,
+  onDelete,
+  appointment,
 }) => {
   const [time, setTime] = useState<string>(
     new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
   );
-  const [description, setDescription] = useState<string>();
+  const [description, setDescription] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const formattedDate = selectedDate?.toISOString().substring(0, 10);
 
@@ -92,7 +96,7 @@ export const Modal: React.FC<ModalProps> = ({
       "appointment_datetime",
       getSelectedDateTimeString(selectedDate, time)
     );
-    formData.append("description", description!);
+    formData.append("description", description);
     onAccept(formData);
     onClose();
   };
@@ -101,8 +105,9 @@ export const Modal: React.FC<ModalProps> = ({
     return null;
   }
 
-  const handleOverlayClick = (event: any) => {
-    if (event.target.id === "modal-overlay") {
+  const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const target = event.target as HTMLDivElement;
+    if (target.id === "modal-overlay") {
       onClose();
     }
   };
@@ -173,23 +178,4 @@ export const Modal: React.FC<ModalProps> = ({
   );
 };
 
-const getSelectedDateTime = (currentDate: Date, currentTime: string) => {
-  return new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth(),
-    currentDate.getDate(),
-    parseInt(currentTime.split(":")[0]),
-    parseInt(currentTime.split(":")[1])
-  );
-};
-
-const getSelectedDateTimeString = (currentDate: Date, currentTime: string) => {
-  const date = getSelectedDateTime(currentDate, currentTime);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-
-  return `${year}-${month}-${day} ${hours}:${minutes}`;
-};
+export default Modal;
