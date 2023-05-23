@@ -37,10 +37,6 @@ export const Modal: React.FC<ModalProps> = ({
   const formattedDate = getCurrentIsoDate(selectedDate).substring(0, 10);
 
   useEffect(() => {
-    setSelectedDate(selectedDay);
-  }, [selectedDate]);
-
-  useEffect(() => {
     if (!isOpen) {
       setDescription("");
       setSelectedDate(new Date());
@@ -54,6 +50,7 @@ export const Modal: React.FC<ModalProps> = ({
       setTime(
         now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
       );
+      setSelectedDate(selectedDay);
       setDescription("");
     }
   }, [isOpen, selectedDay]);
