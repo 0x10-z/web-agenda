@@ -57,7 +57,7 @@ export default function Body({ user }: BodyProps) {
   };
 
   const handleCreateAppointment = async (data: FormData) => {
-    await apiService.submitFormData(data, "appointments/", "POST");
+    await apiService.submitFormData(data, "appointments", "POST");
     await fetchEvents(selectedDate!);
   };
 

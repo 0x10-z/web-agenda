@@ -117,8 +117,7 @@ export const Modal: React.FC<ModalProps> = ({
     <div
       className="fixed inset-0 flex items-center justify-center z-10 bg-black bg-opacity-50"
       id="modal-overlay"
-      onClick={handleOverlayClick}
-    >
+      onClick={handleOverlayClick}>
       <div className="bg-white p-16 w-1/2 flex flex-col justify-center items-center rounded-md shadow-md">
         <h1 className="font-bold text-2xl text-gray-800 text-center pb-4">
           {title}
@@ -155,21 +154,18 @@ export const Modal: React.FC<ModalProps> = ({
         <div className="flex flex-row w-full justify-end">
           <button
             onClick={handleAccept}
-            className="bg-blue-500 text-white px-4 py-2 mx-1 rounded-md"
-          >
+            className="bg-blue-500 text-white px-4 py-2 mx-1 rounded-md">
             Aceptar
           </button>
           <button
             onClick={onClose}
-            className="bg-gray-500 text-white px-4 py-2 mx-1 rounded-md"
-          >
+            className="bg-gray-500 text-white px-4 py-2 mx-1 rounded-md">
             Volver
           </button>
           {appointment && onDelete && (
             <button
               onClick={() => onDelete(appointment.id)}
-              className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 mx-1 rounded-md"
-            >
+              className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 mx-1 rounded-md">
               Eliminar
             </button>
           )}
