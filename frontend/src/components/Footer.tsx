@@ -1,28 +1,11 @@
 import { ApiService } from "services/ApiService";
-import { useEffect, useState } from "react";
+import { Globals } from "Globals";
 
 const Footer = () => {
-  const [backendVersion, setBackendVersion] = useState<string>("");
-
-  useEffect(() => {
-    const fetchBackendVersion = async () => {
-      try {
-        const version = await ApiService.getBackendVersion();
-        if (version) {
-          setBackendVersion(version);
-        }
-      } catch (error) {
-        console.error("Error fetching backend version:", error);
-      }
-    };
-
-    fetchBackendVersion();
-  }, []);
-
   return (
     <div className="flex-none px-3 pt-2 pb-3 text-center text-xs text-gray-600 md:px-4 md:pt-3 md:pb-6">
       <span>Frontend v{process.env.REACT_APP_VERSION}</span> |{" "}
-      <span>Backend v{backendVersion}</span>
+      <span>Backend v{Globals.BACKEND_VERSION}</span>
     </div>
   );
 };

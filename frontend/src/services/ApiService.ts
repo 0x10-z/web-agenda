@@ -58,8 +58,6 @@ export class ApiService {
     const today = getCurrentIsoDate(date);
     const formattedDate = today.substring(0, 10);
     const url = `${this.baseUrl}appointments?date=${formattedDate}`;
-
-    console.log("URL used " + url);
     try {
       const response = await this.fetchJson(url, {
         headers: {
