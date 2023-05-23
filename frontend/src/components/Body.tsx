@@ -202,7 +202,7 @@ export default function Body({ user }: BodyProps) {
           <button
             onClick={handleOpenModal}
             className="flex-1 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 m-2 rounded">
-            Añadir
+            ➕ Añadir
           </button>
         </div>
         <Modal

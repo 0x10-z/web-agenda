@@ -156,18 +156,18 @@ export const Modal: React.FC<ModalProps> = ({
           <button
             onClick={handleAccept}
             className="bg-blue-500 text-white px-4 py-2 mx-1 rounded-md">
-            Aceptar
+            ✅ Aceptar
           </button>
           <button
             onClick={onClose}
             className="bg-gray-500 text-white px-4 py-2 mx-1 rounded-md">
-            Volver
+            ↩️ Volver
           </button>
           {appointment && onDelete && (
             <button
               onClick={() => onDelete(appointment.id)}
               className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 mx-1 rounded-md">
-              Eliminar
+              ❎ Eliminar
             </button>
           )}
         </div>

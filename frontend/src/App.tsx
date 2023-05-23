@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import "./App.css";
-import PageHeader from "./components/PageHeader";
-import Footer from "./components/Footer";
-import Body from "./components/Body";
+import "App.css";
+import PageHeader from "components/PageHeader";
+import Footer from "components/Footer";
+import Body from "components/Body";
 import { ToastContainer } from "react-toastify";
-import { User } from "./models/User";
-import { Auth } from "./utils/auth";
-import LoginForm from "./pages/Login";
+import { User } from "models/User";
+import { Auth } from "utils/auth";
+import LoginForm from "pages/Login";
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
