@@ -1,5 +1,7 @@
 # Agenda
 
+![](https://github.com/0x10-z/nextjs-agenda/actions/workflows/master.yml/badge.svg)
+
 ## Backend API doc
 
 [http://localhost:5000/docs](http://localhost:5000/docs)

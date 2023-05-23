@@ -17,6 +17,7 @@ load_dotenv()
 
 router = APIRouter()
 
+
 @router.post("/login")
 def login(credentials: Login, db: Session = Depends(get_db)):
     response = {"success": False}
@@ -170,12 +171,13 @@ def get_monthly_appointments(
 def index_method_not_allowed():
     return {"detail": "Method Now Allowed", "message": "Please, use POST method"}
 
+
 import io
 from fastapi.responses import FileResponse
 
 
 @router.post("/generate-pdf")
-async def generate_pdf(request: Request):
+async def generate_pdf(request: Request, user: User = Depends(get_api_key)):
     # Crea un documento OpenDocument
     doc = OpenDocumentText()
 
@@ -189,7 +191,7 @@ async def generate_pdf(request: Request):
         output.seek(0)
         content = output.getvalue()
 
-     # Guarda el documento en un archivo temporal
+    # Guarda el documento en un archivo temporal
     with open("temp.odt", "wb") as output:
         doc.save(output)
 

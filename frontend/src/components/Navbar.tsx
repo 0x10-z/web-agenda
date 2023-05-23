@@ -31,12 +31,14 @@ export default function Navbar({ handleLogout }: NavbarProps) {
         <div className="flex dark:text-black">
           <button
             onClick={handleOpenModal}
-            className="btn  bg-green-500 hover:bg-green-700 text-white py-2 px-4 m-2 rounded">
+            className="btn  bg-green-500 hover:bg-green-700 text-white py-2 px-4 m-2 rounded"
+          >
             💻 Crear hoja de cálculo
           </button>
           <button
             onClick={handleLogout}
-            className="btn  bg-red-500 hover:bg-red-700 text-white py-2 px-4 m-2 rounded">
+            className="btn  bg-red-500 hover:bg-red-700 text-white py-2 px-4 m-2 rounded"
+          >
             🔐 Cerrar sesión
           </button>
         </div>

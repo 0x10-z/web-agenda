@@ -30,6 +30,39 @@ export class ApiService {
     }
   }
 
+  async generateOdfPage(total: string, subtotal: string, iva: string) {
+    try {
+      const url = this.baseUrl + "generate-pdf";
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.user.api_key}`,
+        },
+        body: JSON.stringify({
+          subtotal,
+          iva,
+          total,
+        }),
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "informe_" + getCurrentIsoDate(new Date()) + ".odt";
+        link.click();
+        URL.revokeObjectURL(url);
+      } else {
+        // Manejo de errores en caso de que la generación del archivo falle.
+        showToast("No se ha podido generar el informe", "error");
+      }
+    } catch (error) {
+      showToast("No se ha podido generar el informe: " + error, "error");
+    }
+  }
+
   async fetchAppointmentsByMonth(date: Date): Promise<[]> {
     try {
       const year = getCurrentIsoDate(date).substring(0, 4);
