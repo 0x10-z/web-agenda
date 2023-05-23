@@ -1,11 +1,14 @@
 import { Appointment } from "models/Appointment";
 import { User } from "models/User";
-import { getCurrentIsoDate, getSelectedDateTimeFormattedString, showToast } from "utils/util";
+import {
+  getCurrentIsoDate,
+  getSelectedDateTimeFormattedString,
+  showToast,
+} from "utils/util";
 import { Globals } from "Globals";
 import { toast } from "react-toastify";
 
-export class ApiService{
-
+export class ApiService {
   private readonly baseUrl: string = Globals.API_URL;
   private readonly user: User;
 
@@ -15,6 +18,7 @@ export class ApiService{
 
   private async fetchJson(url: string, options?: RequestInit) {
     try {
+      console.log("URL used " + url);
       const response = await fetch(url, options);
       if (response.ok) {
         return await response.json();
@@ -22,7 +26,7 @@ export class ApiService{
         throw new Error("Request failed");
       }
     } catch (error) {
-      showToast(""+error, "error");
+      showToast("" + error, "error");
     }
   }
 
@@ -31,7 +35,8 @@ export class ApiService{
       const year = getCurrentIsoDate(date).substring(0, 4);
       const month = getCurrentIsoDate(date).substring(5, 7);
       const url = `${this.baseUrl}appointments/monthly/${year}/${month}`;
-  
+
+      console.log("URL used " + url);
       const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${this.user.api_key}`,
@@ -47,13 +52,14 @@ export class ApiService{
       console.error("Error fetching data:", error);
       return [];
     }
-  };
+  }
 
   async fetchEvents(date: Date): Promise<Appointment[]> {
     const today = getCurrentIsoDate(date);
     const formattedDate = today.substring(0, 10);
     const url = `${this.baseUrl}appointments?date=${formattedDate}`;
 
+    console.log("URL used " + url);
     try {
       const response = await this.fetchJson(url, {
         headers: {
@@ -74,7 +80,7 @@ export class ApiService{
         );
       }
     } catch (error) {
-      showToast("No se ha podido obtener la lista de citas: "+error, "error");
+      showToast("No se ha podido obtener la lista de citas: " + error, "error");
     }
 
     return [];
@@ -84,6 +90,7 @@ export class ApiService{
     const formDataObj = Object.fromEntries(data.entries());
     const jsonData = JSON.stringify(formDataObj);
 
+    console.log("URL used " + this.baseUrl + url);
     try {
       const response = await this.fetchJson(this.baseUrl + url, {
         method,
@@ -95,12 +102,18 @@ export class ApiService{
       });
 
       if (response) {
-        if (method==="POST"){
+        if (method === "POST") {
           const d = new Date(formDataObj.appointment_datetime.toString());
-          showToast("Se ha creado una cita el "+getSelectedDateTimeFormattedString(d), "success");
-        }else if (method==="PUT"){
+          showToast(
+            "Se ha creado una cita el " + getSelectedDateTimeFormattedString(d),
+            "success"
+          );
+        } else if (method === "PUT") {
           const d = new Date(formDataObj.appointment_datetime.toString());
-          showToast("La cita se ha movido a "+getSelectedDateTimeFormattedString(d), "success");
+          showToast(
+            "La cita se ha movido a " + getSelectedDateTimeFormattedString(d),
+            "success"
+          );
         }
         return response;
       }
@@ -113,6 +126,7 @@ export class ApiService{
 
   async deleteAppointment(appointment_id: string) {
     const url = `${this.baseUrl}appointments/${appointment_id}`;
+    console.log("URL used " + url);
 
     try {
       const response = await this.fetchJson(url, {
@@ -135,6 +149,7 @@ export class ApiService{
 
   static async login(username: string, password: string): Promise<User | null> {
     const baseUrl = Globals.API_URL;
+    console.log("URL used " + baseUrl + "login");
     const response = await fetch(baseUrl + "login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -161,8 +176,9 @@ export class ApiService{
 
   static async getBackendVersion(): Promise<string | null> {
     const baseUrl = Globals.API_URL;
+    console.log("URL used " + baseUrl + "version");
     const response = await fetch(baseUrl + "version", {
-      method: "GET"
+      method: "GET",
     });
     if (response.ok) {
       const data = await response.json();
@@ -173,5 +189,4 @@ export class ApiService{
       );
     }
   }
-
 }
