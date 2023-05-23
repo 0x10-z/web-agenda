@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ExcelSheet from "./ExcelSheet";
+import ExcelSheet from "components/ExcelSheet/ExcelSheet";
 
 interface NavbarProps {
   handleLogout: () => void;
