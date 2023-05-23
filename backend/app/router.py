@@ -8,10 +8,12 @@ from datetime import datetime
 from sqlalchemy import func
 from dotenv import load_dotenv
 from fastapi import Request
-from fastapi.responses import StreamingResponse
 from odf.opendocument import OpenDocumentText
 from odf.text import P
-from fastapi.responses import StreamingResponse
+import calendar
+from datetime import timedelta
+import io
+from fastapi.responses import FileResponse
 
 load_dotenv()
 
@@ -51,7 +53,7 @@ def appointments_update(
     response = {"success": False}
     if updated_appointment:
         try:
-            ModelAppointment.update_appointment(db, id, updated_appointment, user.id)
+            ModelAppointment.update(db, id, updated_appointment, user.id)
             response["success"] = True
             response["appointments"] = ModelAppointment.get_all(db)
         except HTTPException as e:
@@ -70,7 +72,7 @@ def appointments_update(
     response = {"success": False}
     if id:
         try:
-            response["success"] = ModelAppointment.delete_appointment(db, id, user.id)
+            response["success"] = ModelAppointment.delete(db, id, user.id)
             response["appointments"] = ModelAppointment.get_all(db)
         except HTTPException as e:
             response["error"] = str(e.detail)
@@ -130,10 +132,6 @@ def appointments_get(
     return response
 
 
-import calendar
-from datetime import timedelta
-
-
 def get_month_appointments(month: int, year: int, user, db):
     appointments_by_day = []
 
@@ -172,28 +170,19 @@ def index_method_not_allowed():
     return {"detail": "Method Now Allowed", "message": "Please, use POST method"}
 
 
-import io
-from fastapi.responses import FileResponse
-
-
 @router.post("/generate-pdf")
 async def generate_pdf(request: Request, user: User = Depends(get_api_key)):
-    # Crea un documento OpenDocument
     doc = OpenDocumentText()
 
-    # Crea un párrafo y agrega texto
     p = P(text="sadasd, mundo!")
     doc.text.addElement(p)
 
-    # Guarda el documento en un archivo temporal
     with io.BytesIO() as output:
         doc.save(output)
         output.seek(0)
         content = output.getvalue()
 
-    # Guarda el documento en un archivo temporal
     with open("temp.odt", "wb") as output:
         doc.save(output)
 
-    # Devuelve una respuesta de descarga utilizando el archivo guardado
     return FileResponse("temp.odt", filename="document.odt")

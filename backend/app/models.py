@@ -123,7 +123,7 @@ class Appointment(Base):
         return db.query(cls).filter(cls.id == id).first()
 
     @classmethod
-    def delete_appointment(cls, db, id, user_id):
+    def delete(cls, db, id, user_id):
         appointment = db.query(cls).filter_by(id=id, user_id=user_id).first()
         if appointment:
             db.delete(appointment)
@@ -132,7 +132,7 @@ class Appointment(Base):
         return False
 
     @classmethod
-    def update_appointment(
+    def update(
         cls,
         db: Session,
         appointment_id: str,

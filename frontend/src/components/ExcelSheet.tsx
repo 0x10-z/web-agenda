@@ -1,7 +1,237 @@
+import { Entry, Invoice } from "models/Invoice";
 import { User } from "models/User";
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { ApiService } from "services/ApiService";
 import { Auth } from "utils/auth";
+import Decimal from "decimal.js";
+import { showToast } from "utils/util";
+
+declare global {
+  interface String {
+    replaceCommas(): string;
+  }
+}
+
+String.prototype.replaceCommas = function (): string {
+  return this.replace(",", ".");
+};
+
+const ExcelSheetContent = () => {
+  const [services, setServices] = useState<Entry>({
+    name: "Servicios",
+    quantity: "",
+    vat: "0.21",
+    vatTotal: new Decimal(0),
+    total: new Decimal(0),
+  });
+  const [products, setProducts] = useState<Entry>({
+    name: "Productos",
+    quantity: "",
+    vat: "0.21",
+    vatTotal: new Decimal(0),
+    total: new Decimal(0),
+  });
+
+  const [invoice, setInvoice] = useState<Invoice>({
+    month: new Date().getMonth() + 1,
+    year: new Date().getFullYear(),
+    quantityTotal: new Decimal(0),
+    vat: "0.21",
+    vatTotal: new Decimal(0),
+    services: services,
+    products: products,
+    total: new Decimal(0),
+  });
+
+  useEffect(() => {
+    const calculateTotals = () => {
+      // if comma, replace by dot
+      services.quantity = services.quantity.replaceCommas();
+      services.vat = services.vat.replaceCommas();
+      products.quantity = products.quantity.replaceCommas();
+      products.vat = products.vat.replaceCommas();
+      if (
+        hasDotAtStartOrEnd(services.quantity) ||
+        !parseDecimal(services.quantity) ||
+        hasDotAtStartOrEnd(services.vat) ||
+        !parseDecimal(services.vat)
+      ) {
+        return;
+      }
+
+      const servicesVatTotal = new Decimal(services.quantity).times(
+        services.vat
+      );
+      const servicesTotal = new Decimal(services.quantity).plus(
+        servicesVatTotal.toDecimalPlaces(4)
+      );
+      setServices((prevServices) => ({
+        ...prevServices,
+        vatTotal: servicesVatTotal,
+        total: servicesTotal,
+      }));
+
+      if (!parseDecimal(products.quantity) || !parseDecimal(products.vat)) {
+        return;
+      }
+
+      const productsVatTotal = new Decimal(products.quantity).times(
+        products.vat
+      );
+      const productsTotal = new Decimal(products.quantity).plus(
+        productsVatTotal.toDecimalPlaces(4)
+      );
+      setProducts((prevProducts) => ({
+        ...prevProducts,
+        vatTotal: productsVatTotal,
+        total: productsTotal,
+      }));
+
+      const invoiceQuantityTotal = new Decimal(services.quantity).plus(
+        new Decimal(products.quantity)
+      );
+      const invoiceVatTotal = services.vatTotal.plus(products.vatTotal);
+
+      const invoiceTotal = services.total.plus(products.total);
+      setInvoice((prevInvoice) => ({
+        ...prevInvoice,
+        quantityTotal: invoiceQuantityTotal,
+        total: invoiceTotal,
+        vatTotal: invoiceVatTotal,
+      }));
+    };
+
+    calculateTotals();
+  }, [
+    services.quantity,
+    services.vatTotal,
+    services.vat,
+    products.quantity,
+    products.vatTotal,
+    products.vat,
+  ]);
+
+  const handleChange = (field: string, e: ChangeEvent<HTMLInputElement>) => {
+    //const newValue = parseDecimal(e.target.value);
+    const newValue = e.target.value;
+
+    if (field === "servicesQuantity") {
+      setServices((prevServices) => ({
+        ...prevServices,
+        quantity: newValue ? newValue.toString() : "",
+      }));
+    } else if (field === "servicesVat") {
+      setServices((prevServices) => ({
+        ...prevServices,
+        vat: newValue ? newValue.toString() : "",
+      }));
+    } else if (field === "productsQuantity") {
+      setProducts((prevServices) => ({
+        ...prevServices,
+        quantity: newValue ? newValue.toString() : "",
+      }));
+    } else if (field === "productsVat") {
+      setProducts((prevServices) => ({
+        ...prevServices,
+        vat: newValue ? newValue.toString() : "",
+      }));
+    }
+  };
+  return (
+    <div className="w-full py-4">
+      <div className="flex flex-col gap-4">
+        <div className="flex">
+          <div className="flex-1 text-xl font-bold">Resumen mensual</div>
+          <div className="flex-1 mx-4">
+            <select
+              className="w-full bg-gray-200 p-2 rounded"
+              value={invoice.month}
+            >
+              {Array.from({ length: 12 }, (_, index) => (
+                <option key={index} value={index + 1}>
+                  {getMonthName(index + 1)}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex-1 mx-4">
+            <select
+              className="w-full bg-gray-200 p-2 rounded"
+              value={invoice.year}
+            >
+              {Array.from({ length: 11 }, (_, index) => (
+                <option key={index} value={invoice.year + index - 5}>
+                  {invoice.year + index - 5}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div className="flex">
+          <div className="font-bold flex-1 mx-4"></div>
+          <div className="flex-1 mx-4 text-lg font-bold">Neto</div>
+          <div className="flex-1 mx-4 text-lg font-bold">%</div>
+          <div className="flex-1 mx-4 text-lg font-bold">IVA</div>
+          <div className="flex-1 mx-4 text-lg font-bold">Total</div>
+        </div>
+        <div className="flex">
+          <div className="font-bold flex-1 mx-4">{services.name}</div>
+          <div className="flex-1 mx-4">
+            <input
+              type="text"
+              className="w-full bg-gray-200 p-2 rounded"
+              value={services.quantity}
+              onChange={(e) => handleChange("servicesQuantity", e)}
+            />
+          </div>
+          <div className="flex-1 mx-4">
+            <input
+              type="text"
+              className="w-full bg-gray-200 p-2 rounded"
+              value={services.vat}
+              onChange={(e) => handleChange("servicesVat", e)}
+            />
+          </div>
+          <div className="flex-1 mx-4">{services.vatTotal.toFixed(2)} €</div>
+          <div className="flex-1 mx-4">{services.total.toFixed(2)} €</div>
+        </div>
+        <div className="flex">
+          <div className="font-bold flex-1 mx-4">{products.name}</div>
+          <div className="flex-1 mx-4">
+            <input
+              type="text"
+              className="w-full bg-gray-200 p-2 rounded"
+              value={products.quantity}
+              onChange={(e) => handleChange("productsQuantity", e)}
+            />
+          </div>
+          <div className="flex-1 mx-4">
+            <input
+              type="text"
+              className="w-full bg-gray-200 p-2 rounded"
+              value={products.vat}
+              onChange={(e) => handleChange("productsVat", e)}
+            />
+          </div>
+          <div className="flex-1 mx-4">{products.vatTotal.toFixed(2)} €</div>
+          <div className="flex-1 mx-4">{products.total.toFixed(2)} €</div>
+        </div>
+
+        <div className="flex ">
+          <div className="font-bold flex-1 mx-4">Total</div>
+          <div className="flex-1 mx-4">
+            {invoice.quantityTotal.toFixed(2)} €
+          </div>
+          <div className="w-40">{/* cálculo */}</div>
+          <div className="flex-1 mx-4">
+            {invoice.vatTotal.toDecimalPlaces(2).toString()} €
+          </div>
+          <div className="flex-1 mx-4">{invoice.total.toFixed(2)} €</div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 interface ExcelProps {
   isOpen: boolean;
@@ -9,10 +239,6 @@ interface ExcelProps {
 }
 
 const ExcelSheet: React.FC<ExcelProps> = ({ isOpen, onClose }) => {
-  const [subtotal, setSubtotal] = useState("");
-  const [iva, setIva] = useState("");
-  const [total, setTotal] = useState("");
-
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
@@ -24,22 +250,8 @@ const ExcelSheet: React.FC<ExcelProps> = ({ isOpen, onClose }) => {
 
   const apiService = new ApiService(user!);
 
-  const handleSubtotalChange = (event: React.FocusEvent<HTMLDivElement>) => {
-    const newSubtotal = event.target.innerHTML;
-    setSubtotal(newSubtotal);
-    calculateIva(newSubtotal);
-  };
-
-  const calculateIva = (subtotal: string) => {
-    const ivaPercentage = 0.21;
-    const calculatedIva = parseFloat(subtotal) * ivaPercentage;
-    const calculatedTotal = parseFloat(subtotal) + calculatedIva;
-    setIva(calculatedIva.toFixed(2));
-    setTotal(calculatedTotal.toFixed(2));
-  };
-
   const handleGenerateODF = async () => {
-    await apiService.generateOdfPage(total, subtotal, iva);
+    await apiService.generateOdfPage("total", "subtotal", "");
   };
 
   const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -52,41 +264,60 @@ const ExcelSheet: React.FC<ExcelProps> = ({ isOpen, onClose }) => {
   if (!isOpen) {
     return null;
   }
+
   return (
     <div
       className="fixed inset-0 flex items-center justify-center z-10 bg-black bg-opacity-50"
       id="modal-overlay"
       onClick={handleOverlayClick}
     >
-      <div className="bg-white p-16 lg:w-1/3 md:w-1/2 flex flex-col justify-center items-center rounded-md shadow-md">
-        <div>
-          <div>
-            <label>Subtotal:</label>
-            <div
-              className="bg-red-500"
-              contentEditable
-              onBlur={handleSubtotalChange}
-              dangerouslySetInnerHTML={{ __html: subtotal }}
-            />
-          </div>
-          <div>
-            <label>IVA:</label>
-            <div>{iva}</div>
-          </div>
-          <div>
-            <label>Total:</label>
-            <div>{total}</div>
-          </div>
-          <button
-            className="mt-4 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
-            onClick={handleGenerateODF}
-          >
-            Generar ODF
-          </button>
+      <div className="bg-white p-16 lg:w-1/2 md:w-2/3 flex flex-col justify-center items-center rounded-md shadow-md">
+        <div className="container mx-auto py-4">
+          <ExcelSheetContent />
         </div>
+        <button
+          className="mt-4 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
+          onClick={handleGenerateODF}
+        >
+          Generar Informe
+        </button>
       </div>
     </div>
   );
 };
 
 export default ExcelSheet;
+
+function parseDecimal(str: string) {
+  try {
+    const formattedStr = str.replace(",", ".").replace("-", ".");
+    const decimalValue = new Decimal(formattedStr);
+    return decimalValue;
+  } catch (error) {
+    return false;
+  }
+}
+
+function hasDotAtStartOrEnd(text: string): boolean {
+  const regex = /^\./.test(text) || /\.$/.test(text);
+  return regex;
+}
+
+function getMonthName(month: number) {
+  const months = [
+    "Enero",
+    "Febrero",
+    "Marzo",
+    "Abril",
+    "Mayo",
+    "Junio",
+    "Julio",
+    "Agosto",
+    "Septiembre",
+    "Octubre",
+    "Noviembre",
+    "Diciembre",
+  ];
+
+  return months[month - 1];
+}
