@@ -38,11 +38,11 @@ export default function Body({ user }: BodyProps) {
     };
 
     fetchMonthlyAppointments();
-  }, []);
+  }, [selectedDate]);
 
   useEffect(() => {
     fetchEvents(selectedDate);
-  }, []);
+  }, [selectedDate]);
 
   const handleOpenModal = (
     event?: React.MouseEvent<HTMLButtonElement> | Appointment
