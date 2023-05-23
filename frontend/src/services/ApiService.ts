@@ -87,8 +87,6 @@ export class ApiService {
   async submitFormData(data: FormData, url: string, method: string) {
     const formDataObj = Object.fromEntries(data.entries());
     const jsonData = JSON.stringify(formDataObj);
-
-    console.log("URL used " + this.baseUrl + url);
     try {
       const response = await this.fetchJson(this.baseUrl + url, {
         method,

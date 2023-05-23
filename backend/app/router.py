@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, Query, Path
+from fastapi import APIRouter, HTTPException, Depends, Query
 from sqlalchemy.orm import Session
 import os
 from dependencies import get_api_key, get_db
@@ -6,9 +6,11 @@ from models import User, Appointment as ModelAppointment
 from schemas import Appointment, Login
 from datetime import datetime
 from sqlalchemy import func
+from dotenv import load_dotenv
+
+load_dotenv()
 
 router = APIRouter()
-
 
 @router.post("/login")
 def login(credentials: Login, db: Session = Depends(get_db)):

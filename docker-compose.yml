@@ -9,7 +9,7 @@ services:
     environment:
       - USE_DOCKER=yes
       - ALLOWED_ORIGINS=http://localhost:3003
-      - APP_VERSION=2.2.2
+      #- APP_VERSION=2.2.2
     ports:
       - "5000:80"
       - "5678:5678" # debugpy
