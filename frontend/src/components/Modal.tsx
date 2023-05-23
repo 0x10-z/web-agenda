@@ -12,6 +12,7 @@ import { Appointment } from "models/Appointment";
 
 interface ModalProps {
   title: string;
+  selectedDay: Date;
   isOpen: boolean;
   onClose: () => void;
   onAccept: (data: FormData) => void;
@@ -21,6 +22,7 @@ interface ModalProps {
 
 export const Modal: React.FC<ModalProps> = ({
   title,
+  selectedDay,
   isOpen,
   onClose,
   onAccept,
@@ -31,16 +33,22 @@ export const Modal: React.FC<ModalProps> = ({
     new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
   );
   const [description, setDescription] = useState<string>("");
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date>(selectedDay);
   const formattedDate = getCurrentIsoDate(selectedDate).substring(0, 10);
 
   useEffect(() => {
-    if (appointment) {
+    setSelectedDate(selectedDay);
+  }, [selectedDate]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setDescription("");
+      setSelectedDate(new Date());
+    } else if (appointment) {
       setTime(appointment.appointment_datetime.toLocaleTimeString());
       setSelectedDate(appointment.appointment_datetime);
       setDescription(appointment.description);
     } else {
-      // Set current next minute.
       const now = new Date();
       now.setMinutes(now.getMinutes() + 1);
       setTime(
@@ -48,12 +56,7 @@ export const Modal: React.FC<ModalProps> = ({
       );
       setDescription("");
     }
-
-    if (!isOpen) {
-      setDescription("");
-      setSelectedDate(new Date());
-    }
-  }, [isOpen]);
+  }, [isOpen, selectedDay]);
 
   const handleTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setTime(event.target.value);

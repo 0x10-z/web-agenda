@@ -187,7 +187,6 @@ export default function Body({ user }: BodyProps) {
               className="w-full mb-4"
               value={selectedDate}
               onClickDay={handleDayClick}
-              showWeekNumbers={true}
               tileContent={daysWithAppointments}
               locale="es-ES"
             />
@@ -208,6 +207,7 @@ export default function Body({ user }: BodyProps) {
         </div>
         <Modal
           title={modalTitle}
+          selectedDay={selectedDate}
           isOpen={isModalOpen}
           onClose={handleCloseModal}
           {...modalProps}
