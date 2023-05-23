@@ -1,8 +1,28 @@
 import uuid
 from datetime import datetime
 from typing import Optional
+from decimal import Decimal
 
 from pydantic import BaseModel, validator
+
+
+class Entry(BaseModel):
+    name: str
+    quantity: str
+    vat: str
+    vatTotal: Decimal
+    total: Decimal
+
+
+class Invoice(BaseModel):
+    month: int
+    year: int
+    quantityTotal: Decimal
+    vat: str
+    vatTotal: Decimal
+    services: Entry
+    products: Entry
+    total: Decimal
 
 
 class Appointment(BaseModel):

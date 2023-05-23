@@ -1,6 +1,9 @@
 import { Entry, Invoice } from "models/Invoice";
 import { ChangeEvent, useEffect, useState } from "react";
 import Decimal from "decimal.js";
+import { User } from "models/User";
+import { Auth } from "utils/auth";
+import { ApiService } from "services/ApiService";
 
 declare global {
   interface String {
@@ -61,11 +64,6 @@ export const ExcelSheetContent = () => {
       const servicesTotal = new Decimal(services.quantity).plus(
         servicesVatTotal.toDecimalPlaces(4)
       );
-      setServices((prevServices) => ({
-        ...prevServices,
-        vatTotal: servicesVatTotal,
-        total: servicesTotal,
-      }));
 
       if (!parseDecimal(products.quantity) || !parseDecimal(products.vat)) {
         return;
@@ -77,35 +75,38 @@ export const ExcelSheetContent = () => {
       const productsTotal = new Decimal(products.quantity).plus(
         productsVatTotal.toDecimalPlaces(4)
       );
+
+      const invoiceQuantityTotal = new Decimal(services.quantity).plus(
+        new Decimal(products.quantity)
+      );
+      const invoiceVatTotal = servicesVatTotal.plus(productsVatTotal);
+
+      const invoiceTotal = servicesTotal.plus(productsTotal);
+
+      setServices((prevServices) => ({
+        ...prevServices,
+        vatTotal: servicesVatTotal,
+        total: servicesTotal,
+      }));
+
       setProducts((prevProducts) => ({
         ...prevProducts,
         vatTotal: productsVatTotal,
         total: productsTotal,
       }));
 
-      const invoiceQuantityTotal = new Decimal(services.quantity).plus(
-        new Decimal(products.quantity)
-      );
-      const invoiceVatTotal = services.vatTotal.plus(products.vatTotal);
-
-      const invoiceTotal = services.total.plus(products.total);
       setInvoice((prevInvoice) => ({
         ...prevInvoice,
         quantityTotal: invoiceQuantityTotal,
         total: invoiceTotal,
         vatTotal: invoiceVatTotal,
+        products: products,
+        services: services,
       }));
     };
 
     calculateTotals();
-  }, [
-    services.quantity,
-    services.vatTotal,
-    services.vat,
-    products.quantity,
-    products.vatTotal,
-    products.vat,
-  ]);
+  }, [services.quantity, services.vat, products.quantity, products.vat]);
 
   const handleChange = (field: string, e: ChangeEvent<HTMLInputElement>) => {
     //const newValue = parseDecimal(e.target.value);
@@ -133,98 +134,128 @@ export const ExcelSheetContent = () => {
       }));
     }
   };
-  return (
-    <div className="w-full py-4">
-      <div className="flex flex-col gap-4">
-        <div className="flex">
-          <div className="flex-1 text-xl font-bold">Resumen mensual</div>
-          <div className="flex-1 mx-4">
-            <select
-              className="w-full bg-gray-200 p-2 rounded"
-              value={invoice.month}
-            >
-              {Array.from({ length: 12 }, (_, index) => (
-                <option key={index} value={index + 1}>
-                  {getMonthName(index + 1)}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex-1 mx-4">
-            <select
-              className="w-full bg-gray-200 p-2 rounded"
-              value={invoice.year}
-            >
-              {Array.from({ length: 11 }, (_, index) => (
-                <option key={index} value={invoice.year + index - 5}>
-                  {invoice.year + index - 5}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-        <div className="flex">
-          <div className="font-bold flex-1 mx-4"></div>
-          <div className="flex-1 mx-4 text-lg font-bold">Neto</div>
-          <div className="flex-1 mx-4 text-lg font-bold">%</div>
-          <div className="flex-1 mx-4 text-lg font-bold">IVA</div>
-          <div className="flex-1 mx-4 text-lg font-bold">Total</div>
-        </div>
-        <div className="flex">
-          <div className="font-bold flex-1 mx-4">{services.name}</div>
-          <div className="flex-1 mx-4">
-            <input
-              type="text"
-              className="w-full bg-gray-200 p-2 rounded"
-              value={services.quantity}
-              onChange={(e) => handleChange("servicesQuantity", e)}
-            />
-          </div>
-          <div className="flex-1 mx-4">
-            <input
-              type="text"
-              className="w-full bg-gray-200 p-2 rounded"
-              value={services.vat}
-              onChange={(e) => handleChange("servicesVat", e)}
-            />
-          </div>
-          <div className="flex-1 mx-4">{services.vatTotal.toFixed(2)} €</div>
-          <div className="flex-1 mx-4">{services.total.toFixed(2)} €</div>
-        </div>
-        <div className="flex">
-          <div className="font-bold flex-1 mx-4">{products.name}</div>
-          <div className="flex-1 mx-4">
-            <input
-              type="text"
-              className="w-full bg-gray-200 p-2 rounded"
-              value={products.quantity}
-              onChange={(e) => handleChange("productsQuantity", e)}
-            />
-          </div>
-          <div className="flex-1 mx-4">
-            <input
-              type="text"
-              className="w-full bg-gray-200 p-2 rounded"
-              value={products.vat}
-              onChange={(e) => handleChange("productsVat", e)}
-            />
-          </div>
-          <div className="flex-1 mx-4">{products.vatTotal.toFixed(2)} €</div>
-          <div className="flex-1 mx-4">{products.total.toFixed(2)} €</div>
-        </div>
 
-        <div className="flex ">
-          <div className="font-bold flex-1 mx-4">Total</div>
-          <div className="flex-1 mx-4">
-            {invoice.quantityTotal.toFixed(2)} €
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const token = Auth.getToken();
+    if (token) {
+      setUser(token);
+    }
+  }, []);
+
+  const apiService = new ApiService(user!);
+
+  const handleGenerateODF = async () => {
+    await apiService.generateOdfPage(invoice);
+  };
+
+  return (
+    <div className="bg-white p-16 lg:w-1/2 md:w-2/3 flex flex-col justify-center items-center rounded-md shadow-md">
+      <div className="container mx-auto py-4">
+        <div className="w-full py-4">
+          <div className="flex flex-col gap-4">
+            <div className="flex">
+              <div className="flex-1 text-xl font-bold">Resumen mensual</div>
+              <div className="flex-1 mx-4">
+                <select
+                  className="w-full bg-gray-200 p-2 rounded"
+                  value={invoice.month}
+                >
+                  {Array.from({ length: 12 }, (_, index) => (
+                    <option key={index} value={index + 1}>
+                      {getMonthName(index + 1)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex-1 mx-4">
+                <select
+                  className="w-full bg-gray-200 p-2 rounded"
+                  value={invoice.year}
+                >
+                  {Array.from({ length: 11 }, (_, index) => (
+                    <option key={index} value={invoice.year + index - 5}>
+                      {invoice.year + index - 5}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="flex">
+              <div className="font-bold flex-1 mx-4"></div>
+              <div className="flex-1 mx-4 text-lg font-bold">Neto</div>
+              <div className="flex-1 mx-4 text-lg font-bold">%</div>
+              <div className="flex-1 mx-4 text-lg font-bold">IVA</div>
+              <div className="flex-1 mx-4 text-lg font-bold">Total</div>
+            </div>
+            <div className="flex">
+              <div className="font-bold flex-1 mx-4">{services.name}</div>
+              <div className="flex-1 mx-4">
+                <input
+                  type="text"
+                  className="w-full bg-gray-200 p-2 rounded"
+                  value={services.quantity}
+                  onChange={(e) => handleChange("servicesQuantity", e)}
+                />
+              </div>
+              <div className="flex-1 mx-4">
+                <input
+                  type="text"
+                  className="w-full bg-gray-200 p-2 rounded"
+                  value={services.vat}
+                  onChange={(e) => handleChange("servicesVat", e)}
+                />
+              </div>
+              <div className="flex-1 mx-4">
+                {services.vatTotal.toFixed(2)} €
+              </div>
+              <div className="flex-1 mx-4">{services.total.toFixed(2)} €</div>
+            </div>
+            <div className="flex">
+              <div className="font-bold flex-1 mx-4">{products.name}</div>
+              <div className="flex-1 mx-4">
+                <input
+                  type="text"
+                  className="w-full bg-gray-200 p-2 rounded"
+                  value={products.quantity}
+                  onChange={(e) => handleChange("productsQuantity", e)}
+                />
+              </div>
+              <div className="flex-1 mx-4">
+                <input
+                  type="text"
+                  className="w-full bg-gray-200 p-2 rounded"
+                  value={products.vat}
+                  onChange={(e) => handleChange("productsVat", e)}
+                />
+              </div>
+              <div className="flex-1 mx-4">
+                {products.vatTotal.toFixed(2)} €
+              </div>
+              <div className="flex-1 mx-4">{products.total.toFixed(2)} €</div>
+            </div>
+
+            <div className="flex ">
+              <div className="font-bold flex-1 mx-4">Total</div>
+              <div className="flex-1 mx-4">
+                {invoice.quantityTotal.toFixed(2)} €
+              </div>
+              <div className="w-40">{/* cálculo */}</div>
+              <div className="flex-1 mx-4">
+                {invoice.vatTotal.toDecimalPlaces(2).toString()} €
+              </div>
+              <div className="flex-1 mx-4">{invoice.total.toFixed(2)} €</div>
+            </div>
           </div>
-          <div className="w-40">{/* cálculo */}</div>
-          <div className="flex-1 mx-4">
-            {invoice.vatTotal.toDecimalPlaces(2).toString()} €
-          </div>
-          <div className="flex-1 mx-4">{invoice.total.toFixed(2)} €</div>
         </div>
       </div>
+      <button
+        className="mt-4 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
+        onClick={handleGenerateODF}
+      >
+        Generar Informe
+      </button>
     </div>
   );
 };

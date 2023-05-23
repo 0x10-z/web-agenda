@@ -21,21 +21,6 @@ interface ExcelProps {
 }
 
 const ExcelSheet: React.FC<ExcelProps> = ({ isOpen, onClose }) => {
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    const token = Auth.getToken();
-    if (token) {
-      setUser(token);
-    }
-  }, []);
-
-  const apiService = new ApiService(user!);
-
-  const handleGenerateODF = async () => {
-    await apiService.generateOdfPage("total", "subtotal", "");
-  };
-
   const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
     const target = event.target as HTMLDivElement;
     if (target.id === "modal-overlay") {
@@ -53,17 +38,7 @@ const ExcelSheet: React.FC<ExcelProps> = ({ isOpen, onClose }) => {
       id="modal-overlay"
       onClick={handleOverlayClick}
     >
-      <div className="bg-white p-16 lg:w-1/2 md:w-2/3 flex flex-col justify-center items-center rounded-md shadow-md">
-        <div className="container mx-auto py-4">
-          <ExcelSheetContent />
-        </div>
-        <button
-          className="mt-4 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
-          onClick={handleGenerateODF}
-        >
-          Generar Informe
-        </button>
-      </div>
+      <ExcelSheetContent />
     </div>
   );
 };

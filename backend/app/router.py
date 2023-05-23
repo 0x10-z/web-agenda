@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 import os
 from dependencies import get_api_key, get_db
 from models import User, Appointment as ModelAppointment
-from schemas import Appointment, Login
+from schemas import Appointment, Invoice, Login
 from datetime import datetime
 from sqlalchemy import func
 from dotenv import load_dotenv
@@ -170,19 +170,71 @@ def index_method_not_allowed():
     return {"detail": "Method Now Allowed", "message": "Please, use POST method"}
 
 
-@router.post("/generate-pdf")
-async def generate_pdf(request: Request, user: User = Depends(get_api_key)):
+from odf import text, teletype, userfield, table
+from odf.table import Table, TableColumn, TableRow, TableCell
+from odf.style import (
+    Style,
+    TableProperties,
+    TableRowProperties,
+    TableColumnProperties,
+    TableCellProperties,
+)
+from odf.opendocument import load, OpenDocumentText
+
+
+def table():
+    dest_file = "temp.odt"
     doc = OpenDocumentText()
 
-    p = P(text="sadasd, mundo!")
-    doc.text.addElement(p)
+    # table styling - Its like CSS in html
+    table_style = Style(name="table-style", family="table")
+    table_style.addElement(TableProperties(align="margins"))
+    doc.automaticstyles.addElement(table_style)
 
-    with io.BytesIO() as output:
-        doc.save(output)
-        output.seek(0)
-        content = output.getvalue()
+    table_cell_style = Style(name="table-cell-style", family="table-cell")
+    table_cell_style.addElement(TableCellProperties(border="0.05pt solid #000000"))
+    doc.automaticstyles.addElement(table_cell_style)
 
-    with open("temp.odt", "wb") as output:
-        doc.save(output)
+    table_column_style = Style(name="table-column-style", family="table-column")
+    table_column_style.addElement(TableColumnProperties(columnwidth="0.2in"))
+    doc.automaticstyles.addElement(table_column_style)
+
+    table_row_style = Style(name="table-row-style", family="table-row")
+    table_row_style.addElement(TableRowProperties(useoptimalrowheight=False))
+    doc.automaticstyles.addElement(table_row_style)
+    # --styling ends here--
+
+    # create table
+    doc_table = Table(name="xyz-table", stylename="table-style")
+    # add 11 columns to the table
+    table_column = TableColumn(
+        numbercolumnsrepeated="11", stylename="table-column-style"
+    )
+    doc_table.addElement(table_column)
+    """
+    #   or you can do the followig for the same as above
+    for i in range(11):
+        table_column = TableColumn(stylename="table-column-style")
+        doc_table.addElement(table_column)
+    """
+    # add data of 10 rows in the table
+    for i in range(10):
+        table_row = TableRow()
+        doc_table.addElement(table_row)
+        # PUT A TO K IN THE CELLS
+        data = ("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K")
+        for i in list(data):
+            column_data = TableCell(valuetype="string", stylename="table-cell-style")
+            table_row.addElement(column_data)
+            column_data.addElement(text.P(text=i))
+    doc.text.addElement(doc_table)
+    doc.save(dest_file)
+    # print(dir(doc))
+
+
+@router.post("/generate-pdf")
+async def generate_pdf(invoice: Invoice, user: User = Depends(get_api_key)):
+    print(invoice)
+    table()
 
     return FileResponse("temp.odt", filename="document.odt")

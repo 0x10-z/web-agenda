@@ -7,6 +7,7 @@ import {
 } from "utils/util";
 import { Globals } from "Globals";
 import { toast } from "react-toastify";
+import { Invoice } from "models/Invoice";
 
 export class ApiService {
   private readonly baseUrl: string = Globals.API_URL;
@@ -30,20 +31,17 @@ export class ApiService {
     }
   }
 
-  async generateOdfPage(total: string, subtotal: string, iva: string) {
+  async generateOdfPage(invoice: Invoice) {
     try {
       const url = this.baseUrl + "generate-pdf";
+      console.log(invoice);
       const response = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${this.user.api_key}`,
         },
-        body: JSON.stringify({
-          subtotal,
-          iva,
-          total,
-        }),
+        body: JSON.stringify(invoice),
       });
 
       if (response.ok) {
