@@ -1,37 +1,9 @@
 import React, { useState } from "react";
-import { pdf, Document, Page, Text, StyleSheet } from "@react-pdf/renderer";
-import ReactPDF from "@react-pdf/renderer";
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
-const styles = StyleSheet.create({
-  page: {
-    fontFamily: "Helvetica",
-    fontSize: 12,
-    paddingTop: 35,
-    paddingLeft: 35,
-    paddingRight: 35,
-    paddingBottom: 65,
-  },
-  title: {
-    fontSize: 24,
-    textAlign: "center",
-    marginBottom: 20,
-  },
-  subtitle: {
-    fontSize: 18,
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  text: {
-    margin: 10,
-    fontSize: 14,
-    textAlign: "justify",
-  },
-});
 
 const ExcelSheet: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   const [subtotal, setSubtotal] = useState("");
