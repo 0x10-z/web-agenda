@@ -58,7 +58,7 @@ export default function Body({ user }: BodyProps) {
 
   const handleCreateAppointment = async (data: FormData) => {
     await apiService.submitFormData(data, "appointments/", "POST");
-    fetchEvents(selectedDate!);
+    await fetchEvents(selectedDate!);
   };
 
   const handleUpdateAppointment = async (data: FormData) => {
@@ -69,7 +69,7 @@ export default function Body({ user }: BodyProps) {
       `appointments/${appointmentId}`,
       "PUT"
     );
-    fetchEvents(selectedDate!);
+    await fetchEvents(selectedDate!);
   };
 
   const fetchEvents = async (date: Date) => {
@@ -79,7 +79,7 @@ export default function Body({ user }: BodyProps) {
 
   const handleOnDelete = async (appointment_id: string) => {
     await apiService.deleteAppointment(appointment_id);
-    fetchEvents(selectedDate!);
+    await fetchEvents(selectedDate!);
     setIsModalOpen(false);
   };
 
