@@ -116,7 +116,7 @@ export default function Body({ user }: BodyProps) {
       );
 
       if (foundAppointment && foundAppointment.appointments > 0) {
-        return "🕮";
+        return "🔖";
       }
     }
   };
@@ -134,8 +134,8 @@ export default function Body({ user }: BodyProps) {
         onAccept: handleCreateAppointment,
       };
   return (
-    <div className="flex-grow md:mx-10 lg:mx-40 xl:mx-80">
-      <div className="flex flex-col justify-around bg-white rounded-md m-10 h-full">
+    <div className="flex-grow mx-auto max-w-screen-lg">
+      <div className="flex flex-col justify-around bg-white rounded-md h-full">
         <div className="flex flex-row">
           <div className="flex-1">
             <div
@@ -152,7 +152,7 @@ export default function Body({ user }: BodyProps) {
                 value={formattedDate}
                 onChange={handleDateChange}
               />
-              <ul className="flex-1 flex flex-col justify-start max-h-[500px] overflow-y-auto">
+              <ul className="flex-1 flex flex-col justify-start min-h-[450px] max-h-[450px] overflow-y-auto">
                 {eventList &&
                   eventList.map((event: Appointment, index) => (
                     <li

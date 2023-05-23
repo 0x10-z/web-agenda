@@ -118,7 +118,7 @@ export const Modal: React.FC<ModalProps> = ({
       className="fixed inset-0 flex items-center justify-center z-10 bg-black bg-opacity-50"
       id="modal-overlay"
       onClick={handleOverlayClick}>
-      <div className="bg-white p-16 w-1/2 flex flex-col justify-center items-center rounded-md shadow-md">
+      <div className="bg-white p-16 lg:w-1/3 md:w-1/2 flex flex-col justify-center items-center rounded-md shadow-md">
         <h1 className="font-bold text-2xl text-gray-800 text-center pb-4">
           {title}
         </h1>
@@ -146,12 +146,13 @@ export const Modal: React.FC<ModalProps> = ({
           placeholder="Hora"
         />
         <textarea
+          autoFocus
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           className="w-full border p-2 mb-2 shadow-md"
           placeholder="Descripción"
         />
-        <div className="flex flex-row w-full justify-end">
+        <div className="flex flex-row w-full justify-end mt-8">
           <button
             onClick={handleAccept}
             className="bg-blue-500 text-white px-4 py-2 mx-1 rounded-md">

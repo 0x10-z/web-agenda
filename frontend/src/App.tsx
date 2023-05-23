@@ -29,17 +29,14 @@ function App() {
     Auth.removeToken();
   };
   return (
-    <div
-      className="text-gray-700 overflow-hidden min-h-screen flex flex-col bg-slate-200"
-      suppressHydrationWarning={true}
-    >
+    <div className="text-gray-700 overflow-hidden min-h-screen flex flex-col bg-slate-200">
       {user ? (
-        <>
+        <div className="p-4">
           <PageHeader handleLogout={handleLogout} />
           <Body user={user} />
           <Footer />
           <ToastContainer />
-        </>
+        </div>
       ) : (
         <LoginForm onLoginSuccess={handleLoginSuccess} />
       )}
