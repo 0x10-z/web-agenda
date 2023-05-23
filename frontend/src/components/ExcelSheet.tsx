@@ -1,9 +1,37 @@
 import React, { useState } from "react";
+import { pdf, Document, Page, Text, StyleSheet } from "@react-pdf/renderer";
+import ReactPDF from "@react-pdf/renderer";
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
+
+const styles = StyleSheet.create({
+  page: {
+    fontFamily: "Helvetica",
+    fontSize: 12,
+    paddingTop: 35,
+    paddingLeft: 35,
+    paddingRight: 35,
+    paddingBottom: 65,
+  },
+  title: {
+    fontSize: 24,
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  subtitle: {
+    fontSize: 18,
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  text: {
+    margin: 10,
+    fontSize: 14,
+    textAlign: "justify",
+  },
+});
 
 const ExcelSheet: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   const [subtotal, setSubtotal] = useState("");
@@ -25,7 +53,31 @@ const ExcelSheet: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   };
 
   const handleGenerateODF = async () => {
-    // logic generate document
+    // Send to fastapi in order to download something
+    const response = await fetch("http://localhost:5000/generate-pdf", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        subtotal,
+        iva,
+        total,
+      }),
+    });
+
+    if (response.ok) {
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "document.odt";
+      link.click();
+      URL.revokeObjectURL(url);
+    } else {
+      // Manejo de errores en caso de que la generación del archivo falle.
+      console.log("Error al generar el archivo PDF");
+    }
   };
 
   const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {

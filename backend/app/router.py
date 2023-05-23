@@ -7,6 +7,11 @@ from schemas import Appointment, Login
 from datetime import datetime
 from sqlalchemy import func
 from dotenv import load_dotenv
+from fastapi import Request
+from fastapi.responses import StreamingResponse
+from odf.opendocument import OpenDocumentText
+from odf.text import P
+from fastapi.responses import StreamingResponse
 
 load_dotenv()
 
@@ -164,3 +169,29 @@ def get_monthly_appointments(
 @router.get("/")
 def index_method_not_allowed():
     return {"detail": "Method Now Allowed", "message": "Please, use POST method"}
+
+import io
+from fastapi.responses import FileResponse
+
+
+@router.post("/generate-pdf")
+async def generate_pdf(request: Request):
+    # Crea un documento OpenDocument
+    doc = OpenDocumentText()
+
+    # Crea un párrafo y agrega texto
+    p = P(text="sadasd, mundo!")
+    doc.text.addElement(p)
+
+    # Guarda el documento en un archivo temporal
+    with io.BytesIO() as output:
+        doc.save(output)
+        output.seek(0)
+        content = output.getvalue()
+
+     # Guarda el documento en un archivo temporal
+    with open("temp.odt", "wb") as output:
+        doc.save(output)
+
+    # Devuelve una respuesta de descarga utilizando el archivo guardado
+    return FileResponse("temp.odt", filename="document.odt")
