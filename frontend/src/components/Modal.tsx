@@ -106,6 +106,8 @@ export const Modal: React.FC<ModalProps> = ({
     return null;
   }
 
+  const timeOptions: string[] = generateTimeSlots();
+
   const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
     const target = event.target as HTMLDivElement;
     if (target.id === "modal-overlay") {
@@ -113,11 +115,13 @@ export const Modal: React.FC<ModalProps> = ({
     }
   };
 
+  console.log(time.slice(0, 5) === "20:00");
   return (
     <div
       className="fixed inset-0 flex items-center justify-center z-10 bg-black bg-opacity-50"
       id="modal-overlay"
-      onClick={handleOverlayClick}>
+      onClick={handleOverlayClick}
+    >
       <div className="bg-white p-16 lg:w-1/3 md:w-1/2 flex flex-col justify-center items-center rounded-md shadow-md">
         <h1 className="font-bold text-2xl text-gray-800 text-center pb-4">
           {title}
@@ -138,13 +142,17 @@ export const Modal: React.FC<ModalProps> = ({
           className="w-full border p-2 mb-2 shadow-md"
           placeholder="Fecha"
         />
-        <input
-          type="time"
-          value={time}
-          onChange={handleTimeChange}
+        <select
+          value={time.slice(0, 5)}
+          onChange={(e) => setTime(e.target.value)}
           className="w-full border p-2 mb-2 shadow-md"
-          placeholder="Hora"
-        />
+        >
+          {timeOptions.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
         <textarea
           autoFocus
           value={description}
@@ -155,18 +163,21 @@ export const Modal: React.FC<ModalProps> = ({
         <div className="flex flex-row w-full justify-end mt-8">
           <button
             onClick={handleAccept}
-            className="bg-blue-500 text-white px-4 py-2 mx-1 rounded-md">
+            className="bg-blue-500 text-white px-4 py-2 mx-1 rounded-md"
+          >
             ✅ Aceptar
           </button>
           <button
             onClick={onClose}
-            className="bg-gray-500 text-white px-4 py-2 mx-1 rounded-md">
+            className="bg-gray-500 text-white px-4 py-2 mx-1 rounded-md"
+          >
             ↩️ Volver
           </button>
           {appointment && onDelete && (
             <button
               onClick={() => onDelete(appointment.id)}
-              className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 mx-1 rounded-md">
+              className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 mx-1 rounded-md"
+            >
               ❎ Eliminar
             </button>
           )}
@@ -177,3 +188,24 @@ export const Modal: React.FC<ModalProps> = ({
 };
 
 export default Modal;
+
+function generateTimeSlots() {
+  // Nuevo código para generar las opciones de tiempo de 30 minutos
+  const timeOptions: string[] = [];
+  const startTime = new Date();
+  startTime.setHours(7, 30, 0, 0); // Establece la hora de inicio en 00:00:00
+  const endTime = new Date();
+  endTime.setHours(20, 30, 0, 0); // Establece la hora de fin en 23:30:00
+
+  let currentTime = startTime;
+  while (currentTime <= endTime) {
+    const formattedTime = currentTime.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    timeOptions.push(formattedTime);
+    currentTime.setMinutes(currentTime.getMinutes() + 30);
+  }
+
+  return timeOptions;
+}
