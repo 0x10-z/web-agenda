@@ -4,7 +4,7 @@ import packageJson from "../package.json";
 export class Globals {
   static API_URL = process.env.REACT_APP_API_URL || "";
   static FRONTEND_VERSION = packageJson.version || "Version Not Found";
-  static BACKEND_VERSION: string | null;
+  private static BACKEND_VERSION: string | null;
 
   static async getBackendVersion() {
     if (!Globals.BACKEND_VERSION) {
