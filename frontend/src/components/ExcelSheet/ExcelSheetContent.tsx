@@ -1,9 +1,11 @@
 import { Entry, Invoice } from "models/Invoice";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import Decimal from "decimal.js";
 import { User } from "models/User";
 import { Auth } from "utils/auth";
 import { ApiService } from "services/ApiService";
+import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
 
 declare global {
   interface String {
@@ -16,6 +18,8 @@ String.prototype.replaceCommas = function (): string {
 };
 
 export const ExcelSheetContent = () => {
+  const targetPdfRef = useRef<HTMLDivElement>(null);
+
   const [services, setServices] = useState<Entry>({
     name: "Servicios",
     quantity: "",
@@ -147,11 +151,62 @@ export const ExcelSheetContent = () => {
   const apiService = new ApiService(user!);
 
   const handleGenerateODF = async () => {
+    if (targetPdfRef.current) {
+      targetPdfRef.current.id = "print-pdf";
+
+      const scale = 2;
+      const canvas = await html2canvas(targetPdfRef.current, { scale });
+      const imgData = canvas.toDataURL("image/png");
+
+      // DOWNLOAD IMAGE
+      const downloadLink = document.createElement("a");
+      downloadLink.href = imgData;
+      downloadLink.download = "myimage.png";
+      // downloadLink.click();
+      // return;
+      //
+
+      const pdf = new jsPDF({
+        orientation: "landscape",
+        unit: "mm",
+      });
+
+      pdf.addImage(
+        imgData,
+        "PNG",
+        0,
+        0,
+        pdf.internal.pageSize.getWidth(),
+        pdf.internal.pageSize.getHeight()
+      );
+      pdf.save("mypdf.pdf");
+
+      // const doc = new jsPDF({
+      //   orientation: "landscape",
+      //   format: "a4",
+      //   unit: "mm",
+      //   putOnlyUsedFonts: true,
+      // });
+
+      // const contentToPrint = document.querySelector("#print-pdf");
+      // if (contentToPrint instanceof HTMLElement) {
+      //   doc.html(contentToPrint, {
+      //     callback: function (pdf) {
+      //       const pageCount = doc.getNumberOfPages();
+      //       //pdf.deletePage(pageCount);
+      //       pdf.save("mypdf.pdf");
+      //     },
+      //   });
+    }
+
+    return;
     await apiService.generateOdfPage(invoice);
   };
 
   return (
-    <div className="bg-white p-16 lg:w-1/2 md:w-2/3 flex flex-col justify-center items-center rounded-md shadow-md">
+    <div
+      ref={targetPdfRef}
+      className="bg-white p-16 lg:w-1/2 md:w-2/3 flex flex-col justify-center items-center rounded-md shadow-md">
       <div className="container mx-auto py-4">
         <div className="w-full py-4">
           <div className="flex flex-col gap-4">
@@ -160,8 +215,7 @@ export const ExcelSheetContent = () => {
               <div className="flex-1 mx-4">
                 <select
                   className="w-full bg-gray-200 p-2 rounded"
-                  value={invoice.month}
-                >
+                  value={invoice.month}>
                   {Array.from({ length: 12 }, (_, index) => (
                     <option key={index} value={index + 1}>
                       {getMonthName(index + 1)}
@@ -172,8 +226,7 @@ export const ExcelSheetContent = () => {
               <div className="flex-1 mx-4">
                 <select
                   className="w-full bg-gray-200 p-2 rounded"
-                  value={invoice.year}
-                >
+                  value={invoice.year}>
                   {Array.from({ length: 11 }, (_, index) => (
                     <option key={index} value={invoice.year + index - 5}>
                       {invoice.year + index - 5}
@@ -252,8 +305,7 @@ export const ExcelSheetContent = () => {
       </div>
       <button
         className="mt-4 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
-        onClick={handleGenerateODF}
-      >
+        onClick={handleGenerateODF}>
         Generar Informe
       </button>
     </div>

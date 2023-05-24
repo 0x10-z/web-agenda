@@ -1,19 +1,5 @@
-import { User } from "models/User";
-import React, { useEffect, useState } from "react";
-import { ApiService } from "services/ApiService";
-import { Auth } from "utils/auth";
-import Decimal from "decimal.js";
+import React from "react";
 import { ExcelSheetContent } from "./ExcelSheetContent";
-
-declare global {
-  interface String {
-    replaceCommas(): string;
-  }
-}
-
-String.prototype.replaceCommas = function (): string {
-  return this.replace(",", ".");
-};
 
 interface ExcelProps {
   isOpen: boolean;
@@ -36,8 +22,7 @@ const ExcelSheet: React.FC<ExcelProps> = ({ isOpen, onClose }) => {
     <div
       className="fixed inset-0 flex items-center justify-center z-10 bg-black bg-opacity-50"
       id="modal-overlay"
-      onClick={handleOverlayClick}
-    >
+      onClick={handleOverlayClick}>
       <ExcelSheetContent />
     </div>
   );
