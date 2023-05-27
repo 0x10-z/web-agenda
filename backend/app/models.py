@@ -7,8 +7,11 @@ from typing import List
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, func
 from sqlalchemy.orm import Session, relationship
 from fastapi import HTTPException
-
+from dotenv import load_dotenv
+import os
 from database import Base
+
+load_dotenv()
 
 
 def generate_uuid():
@@ -78,7 +81,11 @@ def verify_password(password: str, hashed_password: str) -> bool:
 
 def create_initial_users(db: Session):
     if not User.exists(db):
-        User.create(db, username="user", password="user"),
+        User.create(
+            db,
+            username=os.getenv("DB_DEFAULT_USER"),
+            password=os.getenv("DB_DEFAULT_PASS"),
+        ),
         print("Initial users created.")
     else:
         print("There are users in the database, initial users not created.")
