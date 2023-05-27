@@ -35,11 +35,11 @@ function App() {
           <PageHeader handleLogout={handleLogout} />
           <Body user={user} />
           <Footer />
-          <ToastContainer />
         </div>
       ) : (
         <LoginForm onLoginSuccess={handleLoginSuccess} />
       )}
+      <ToastContainer />
     </div>
   );
 }

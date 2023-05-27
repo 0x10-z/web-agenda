@@ -36,33 +36,34 @@ export const Modal: React.FC<ModalProps> = ({
   onDelete,
   appointment,
 }) => {
-  const [time, setTime] = useState<string>(
-    new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-  );
+  const timeOptions: string[] = generateTimeSlots();
+
+  const [time, setTime] = useState<string>(timeOptions[0]);
   const [description, setDescription] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<Date>(selectedDay);
   const formattedDate = getCurrentIsoDate(selectedDate).substring(0, 10);
 
   useEffect(() => {
     if (!isOpen) {
+      // On close, modal cleaned
       setDescription("");
       setSelectedDate(new Date());
     } else if (appointment) {
+      // If update, set appointment data
       setTime(appointment.appointment_datetime.toLocaleTimeString());
       setSelectedDate(appointment.appointment_datetime);
       setDescription(appointment.description);
     } else {
+      // If its new, initialize displayed info
       const now = new Date();
       now.setMinutes(now.getMinutes() + 1);
-      setTime(
-        now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-      );
+      setTime(timeOptions[0]);
       setSelectedDate(selectedDay);
       setDescription("");
     }
   }, [isOpen, selectedDay]);
 
-  const handleTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTimeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setTime(event.target.value);
   };
 
@@ -113,8 +114,6 @@ export const Modal: React.FC<ModalProps> = ({
     return null;
   }
 
-  const timeOptions: string[] = generateTimeSlots();
-
   const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
     const target = event.target as HTMLDivElement;
     if (target.id === "modal-overlay") {
@@ -150,7 +149,7 @@ export const Modal: React.FC<ModalProps> = ({
         />
         <select
           value={time.slice(0, 5)}
-          onChange={(e) => setTime(e.target.value)}
+          onChange={(e) => handleTimeChange(e)}
           className="w-full border p-2 mb-2 shadow-md"
         >
           {timeOptions.map((option) => (
