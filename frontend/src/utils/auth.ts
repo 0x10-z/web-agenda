@@ -5,10 +5,9 @@ export class Auth {
 
   static getToken(): UserProps | null {
     const item = localStorage.getItem(this.storageKey);
-    if (item){
-      console.log(item);
+    if (item) {
       return JSON.parse(item);
-    }else{
+    } else {
       return null;
     }
   }

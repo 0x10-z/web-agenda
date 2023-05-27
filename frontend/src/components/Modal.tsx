@@ -115,7 +115,6 @@ export const Modal: React.FC<ModalProps> = ({
     }
   };
 
-  console.log(time.slice(0, 5) === "20:00");
   return (
     <div
       className="fixed inset-0 flex items-center justify-center z-10 bg-black bg-opacity-50"

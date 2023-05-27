@@ -19,7 +19,6 @@ export class ApiService {
 
   private async fetchJson(url: string, options?: RequestInit) {
     try {
-      console.log("URL used " + url);
       const response = await fetch(url, options);
       if (response.ok) {
         return await response.json();
@@ -34,7 +33,6 @@ export class ApiService {
   async generateOdfPage(invoice: Invoice) {
     try {
       const url = this.baseUrl + "generate-pdf";
-      console.log(invoice);
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -67,7 +65,6 @@ export class ApiService {
       const month = getCurrentIsoDate(date).substring(5, 7);
       const url = `${this.baseUrl}appointments/monthly/${year}/${month}`;
 
-      console.log("URL used " + url);
       const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${this.user.api_key}`,
@@ -153,7 +150,6 @@ export class ApiService {
 
   async deleteAppointment(appointment_id: string) {
     const url = `${this.baseUrl}appointments/${appointment_id}`;
-    console.log("URL used " + url);
 
     try {
       const response = await this.fetchJson(url, {
@@ -176,7 +172,6 @@ export class ApiService {
 
   static async login(username: string, password: string): Promise<User | null> {
     const baseUrl = Globals.API_URL;
-    console.log("URL used " + baseUrl + "login");
     const response = await fetch(baseUrl + "login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -203,7 +198,6 @@ export class ApiService {
 
   static async getBackendVersion(): Promise<string | null> {
     const baseUrl = Globals.API_URL;
-    console.log("URL used " + baseUrl + "version");
     const response = await fetch(baseUrl + "version", {
       method: "GET",
     });
