@@ -4,6 +4,8 @@ services:
     environment:
       - USE_DOCKER=yes
       - ALLOWED_ORIGINS=https://agenda.ikerocio.com,http://35.180.123.117:5000
+      - DB_DEFAULT_USER=user
+      - DB_DEFAULT_PASS=user
     volumes:
       - ./db:/app/db:z
     ports:
