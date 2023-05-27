@@ -31,7 +31,15 @@ function LoginForm({ onLoginSuccess }: LoginProps) {
 
   return (
     <div className="flex h-full flex-col min-h-screen bg-gray-100 sm:justify-center items-center pt-6 sm:pt-0 overflow-y-hidden max-w-screen">
-      <div className="flex-grow w-full sm:max-w-md mt-6 px-6 py-4 overflow-hidden sm:rounded-lg flex flex-col justify-center">
+      <div className="flex-grow w-full sm:max-w-md px-6 py-4 overflow-hidden sm:rounded-lg flex flex-col justify-center">
+        <div className="flex items-center justify-center w-full mb-4">
+          <img
+            src="/paredh2u.png"
+            width={250}
+            alt="Peluqueria H2U Logo"
+            className="rounded-md shadow-sm"
+          />
+        </div>
         <h2 className="text-center font-semibold text-3xl lg:text-4xl text-gray-800 mb-4">
           Iniciar sesión
         </h2>
