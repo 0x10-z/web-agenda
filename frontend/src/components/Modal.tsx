@@ -9,6 +9,13 @@ import {
   showToast,
 } from "../utils/util";
 import { Appointment } from "models/Appointment";
+import {
+  faTrash,
+  faSync,
+  faArrowLeft,
+  faPlusSquare,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface ModalProps {
   title: string;
@@ -164,20 +171,28 @@ export const Modal: React.FC<ModalProps> = ({
             onClick={handleAccept}
             className="bg-blue-500 text-white px-4 py-2 mx-1 rounded-md"
           >
-            ✅ Aceptar
+            {appointment ? (
+              <>
+                <FontAwesomeIcon icon={faSync} /> Actualizar
+              </>
+            ) : (
+              <>
+                <FontAwesomeIcon icon={faPlusSquare} /> Crear
+              </>
+            )}
           </button>
           <button
             onClick={onClose}
             className="bg-gray-500 text-white px-4 py-2 mx-1 rounded-md"
           >
-            ↩️ Volver
+            <FontAwesomeIcon icon={faArrowLeft} /> Volver
           </button>
           {appointment && onDelete && (
             <button
               onClick={() => onDelete(appointment.id)}
               className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 mx-1 rounded-md"
             >
-              ❎ Eliminar
+              <FontAwesomeIcon icon={faTrash} /> Eliminar
             </button>
           )}
         </div>

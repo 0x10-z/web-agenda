@@ -1,5 +1,11 @@
 import React, { useState } from "react";
 import ExcelSheet from "components/ExcelSheet/ExcelSheet";
+import {
+  faCut,
+  faFileExcel,
+  faSignOutAlt,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface NavbarProps {
   handleLogout: () => void;
@@ -26,20 +32,24 @@ export default function Navbar({ handleLogout }: NavbarProps) {
             alt="Logo"
             className="h-10 mr-3 rounded-md shadow-sm"
           />
-          <span className="font-bold text-xl tracking-tight">✂️ Agenda</span>
+          <span className="font-bold text-xl tracking-tight">
+            <FontAwesomeIcon icon={faCut} />
+            {" - "}
+            Agenda
+          </span>
         </div>
         <div className="flex dark:text-black">
           <button
             onClick={handleOpenModal}
             className="btn  bg-green-500 hover:bg-green-700 text-white py-2 px-4 m-2 rounded"
           >
-            💻 Crear hoja de cálculo
+            <FontAwesomeIcon icon={faFileExcel} /> Crear hoja de cálculo
           </button>
           <button
             onClick={handleLogout}
             className="btn  bg-red-500 hover:bg-red-700 text-white py-2 px-4 m-2 rounded"
           >
-            🔐 Cerrar sesión
+            <FontAwesomeIcon icon={faSignOutAlt} /> Cerrar sesión
           </button>
         </div>
       </nav>

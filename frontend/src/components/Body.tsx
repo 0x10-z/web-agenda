@@ -8,6 +8,8 @@ import { Appointment } from "models/Appointment";
 import { Tooltip } from "react-tooltip";
 import { ApiService } from "services/ApiService";
 import { getCurrentIsoDate } from "utils/util";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPlus, faPlusSquare } from "@fortawesome/free-solid-svg-icons";
 
 interface MonthlyAppointmentsProps {
   day: number;
@@ -134,8 +136,8 @@ export default function Body({ user }: BodyProps) {
         onAccept: handleCreateAppointment,
       };
   return (
-    <div className="flex-grow mx-auto max-w-screen-lg">
-      <div className="flex flex-col justify-around bg-white rounded-md h-full">
+    <div className="flex-grow mx-auto max-w-screen-lg ">
+      <div className="flex flex-col justify-around bg-white rounded-md h-full border border-slate-300">
         <div className="flex flex-row">
           <div className="flex-1">
             <div
@@ -154,7 +156,7 @@ export default function Body({ user }: BodyProps) {
                 onChange={handleDateChange}
               />
               <ul className="flex-1 flex flex-col justify-start min-h-[450px] max-h-[450px] overflow-y-auto">
-                {eventList &&
+                {eventList.length > 0 ? (
                   eventList.map((event: Appointment, index) => (
                     <li
                       key={event.id}
@@ -167,7 +169,10 @@ export default function Body({ user }: BodyProps) {
                     >
                       {index + 1} - {event.description} - {event.localeTime()}
                     </li>
-                  ))}
+                  ))
+                ) : (
+                  <p>No hay citas disponibles.</p>
+                )}
                 <Tooltip
                   id={`tooltip`}
                   place="right"
@@ -207,7 +212,8 @@ export default function Body({ user }: BodyProps) {
             onClick={handleOpenModal}
             className="flex-1 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 m-2 rounded"
           >
-            ➕ Añadir
+            <FontAwesomeIcon icon={faPlusSquare} size="lg" className="mr-2" />
+            Añadir
           </button>
         </div>
         <Modal
