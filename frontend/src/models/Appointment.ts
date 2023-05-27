@@ -48,8 +48,5 @@ export class Appointment {
     };
 
     return this.created_at.toLocaleString([], options);
-    //const createdDate = new Date(this.created_at);
-    //const formatter = new Intl.DateTimeFormat([], options);
-    //return formatter.format(createdDate);
   }
 }
