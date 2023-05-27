@@ -4,8 +4,9 @@ const CACHE_URLS = [
   "/",
   "/index.html",
   "/manifest.json",
-  "/logo192.png",
-  "/favicon.ico",
+  "/favicon/apple-touch-icon.png",
+  "/favicon/android-chrome-192x192.png",
+  "/favicon/favicon.ico",
   "/sw.js",
 ];
 
