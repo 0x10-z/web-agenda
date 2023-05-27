@@ -1,5 +1,5 @@
 const CACHE_VERSION = "v1.0";
-const CACHE_NAME = `my-app-${CACHE_VERSION}`;
+const CACHE_NAME = `agenda-${CACHE_VERSION}`;
 const CACHE_URLS = [
   "/",
   "/index.html",
@@ -21,7 +21,7 @@ self.addEventListener("activate", (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          if (cacheName.startsWith("my-app-") && cacheName !== CACHE_NAME) {
+          if (cacheName.startsWith("agenda-") && cacheName !== CACHE_NAME) {
             return caches.delete(cacheName);
           }
           return null;
