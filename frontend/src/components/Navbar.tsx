@@ -24,7 +24,7 @@ export default function Navbar({ handleLogout }: NavbarProps) {
             width={40}
             height={40}
             alt="Logo"
-            className="h-10 mr-3"
+            className="h-10 mr-3 rounded-md shadow-sm"
           />
           <span className="font-bold text-xl tracking-tight">✂️ Agenda</span>
         </div>

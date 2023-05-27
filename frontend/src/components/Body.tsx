@@ -140,7 +140,8 @@ export default function Body({ user }: BodyProps) {
           <div className="flex-1">
             <div
               id="left-sidebar"
-              className="flex flex-col h-full overflow-hidden p-4">
+              className="flex flex-col h-full overflow-hidden p-4"
+            >
               <div className="flex justify-center pb-4">
                 <h1 className="font-bold pb-2 text-2xl text-gray-800">
                   {getDateTitle(selectedDate)}
@@ -162,7 +163,8 @@ export default function Body({ user }: BodyProps) {
                       onClick={() => handleOpenModal(event)}
                       className={`rounded p-2 hover:bg-gray-700 hover:text-white hover:cursor-pointer ${
                         index % 2 === 0 ? "bg-white" : "bg-gray-200"
-                      }`}>
+                      }`}
+                    >
                       {index + 1} - {event.description} - {event.localeTime()}
                     </li>
                   ))}
@@ -176,7 +178,8 @@ export default function Body({ user }: BodyProps) {
           </div>
           <div
             id="right-sidebar"
-            className="hidden md:flex md:flex-1 p-4 flex-col justify-center items-center">
+            className="hidden md:flex md:flex-1 p-4 flex-col justify-center items-center"
+          >
             <input
               type="date"
               className="flex mb-4 p-2 border border-gray-300 rounded"
@@ -192,16 +195,18 @@ export default function Body({ user }: BodyProps) {
             />
             <img
               alt="h2u-logo-picture"
-              src="/paredh2u.jpg"
+              src="/paredh2u.png"
               width={600}
               height={430}
+              className="rounded-md shadow-sm"
             />
           </div>
         </div>
         <div className="flex flex-col md:flex-row m-4">
           <button
             onClick={handleOpenModal}
-            className="flex-1 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 m-2 rounded">
+            className="flex-1 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 m-2 rounded"
+          >
             ➕ Añadir
           </button>
         </div>
