@@ -14,32 +14,42 @@ export class Appointment {
   user_id: number;
   created_at: Date;
 
-  constructor(id: string, description: string, appointment_datetime: string, user_id: number, created_at: string) {
+  constructor(
+    id: string,
+    description: string,
+    appointment_datetime: string,
+    user_id: number,
+    created_at: string
+  ) {
     this.id = id;
     this.description = description;
     this.appointment_datetime = new Date(appointment_datetime);
     this.user_id = user_id;
-    this.created_at = new Date(created_at);
+    this.created_at = new Date(created_at + "Z");
   }
 
-  localeTime(){
+  localeTime() {
     const options: Intl.DateTimeFormatOptions = {
-      hour: '2-digit',
-      minute: '2-digit',
+      hour: "2-digit",
+      minute: "2-digit",
     };
 
     return this.appointment_datetime.toLocaleString([], options);
   }
 
-  createdAtTime(){
+  createdAtTime() {
     const options: Intl.DateTimeFormatOptions = {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      timeZone: "Europe/Madrid",
     };
 
     return this.created_at.toLocaleString([], options);
+    //const createdDate = new Date(this.created_at);
+    //const formatter = new Intl.DateTimeFormat([], options);
+    //return formatter.format(createdDate);
   }
 }

@@ -9,7 +9,7 @@ import { Tooltip } from "react-tooltip";
 import { ApiService } from "services/ApiService";
 import { getCurrentIsoDate } from "utils/util";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus, faPlusSquare } from "@fortawesome/free-solid-svg-icons";
+import { faPlusSquare } from "@fortawesome/free-solid-svg-icons";
 
 interface MonthlyAppointmentsProps {
   day: number;
