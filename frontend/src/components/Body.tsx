@@ -9,7 +9,7 @@ import { Tooltip } from "react-tooltip";
 import { ApiService } from "services/ApiService";
 import { getCurrentIsoDate } from "utils/util";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlusSquare } from "@fortawesome/free-solid-svg-icons";
+import { faPlusSquare, faTag } from "@fortawesome/free-solid-svg-icons";
 
 interface MonthlyAppointmentsProps {
   day: number;
@@ -118,7 +118,20 @@ export default function Body({ user }: BodyProps) {
       );
 
       if (foundAppointment && foundAppointment.appointments > 0) {
-        return "🔖";
+        const appointments = foundAppointment.appointments;
+
+        const tagColor =
+          appointments < 5 ? "green" : appointments < 9 ? "orange" : "red";
+
+        return (
+          <FontAwesomeIcon
+            icon={faTag}
+            size="sm"
+            className="mt-1 ml-1"
+            style={{ color: tagColor }}
+          />
+        );
+        //return "🔖";
       }
     }
   };
