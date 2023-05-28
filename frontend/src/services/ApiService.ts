@@ -59,6 +59,29 @@ export class ApiService {
     }
   }
 
+  async importDb(file: File) {
+    try {
+      let formData = new FormData();
+      formData.append("file", file, "filename.csv");
+      const url = this.baseUrl + "import-db";
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${this.user.api_key}`,
+        },
+        body: formData,
+      });
+
+      if (response.ok) {
+        showToast("Archivo importado satisfactoriamente", "success");
+      } else {
+        showToast("No se ha podido importar la base de datos", "error");
+      }
+    } catch (error) {
+      showToast("No se ha podido importar la base de datos: " + error, "error");
+    }
+  }
+
   async fetchAppointmentsByMonth(date: Date): Promise<[]> {
     try {
       const year = getCurrentIsoDate(date).substring(0, 4);

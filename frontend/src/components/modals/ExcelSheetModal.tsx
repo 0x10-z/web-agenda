@@ -6,6 +6,7 @@ import { Auth } from "utils/auth";
 import { ApiService } from "services/ApiService";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
+import ModalBase from "components/modals/ModalBase";
 
 declare global {
   interface String {
@@ -17,7 +18,15 @@ String.prototype.replaceCommas = function (): string {
   return this.replace(",", ".");
 };
 
-export const ExcelSheetContent = () => {
+interface ExcelSheetModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const ExcelSheetModal: React.FC<ExcelSheetModalProps> = ({
+  isOpen,
+  onClose,
+}) => {
   const targetPdfRef = useRef<HTMLDivElement>(null);
 
   const [services, setServices] = useState<Entry>({
@@ -204,10 +213,8 @@ export const ExcelSheetContent = () => {
   };
 
   return (
-    <div
-      ref={targetPdfRef}
-      className="bg-white p-16 lg:w-1/2 md:w-2/3 flex flex-col justify-center items-center rounded-md shadow-md">
-      <div className="container mx-auto py-4">
+    <ModalBase title="Generar Informe" isOpen={isOpen} onClose={onClose}>
+      <div ref={targetPdfRef} className="container mx-auto py-4">
         <div className="w-full py-4">
           <div className="flex flex-col gap-4">
             <div className="flex">
@@ -215,7 +222,8 @@ export const ExcelSheetContent = () => {
               <div className="flex-1 mx-4">
                 <select
                   className="w-full bg-gray-200 p-2 rounded"
-                  value={invoice.month}>
+                  value={invoice.month}
+                >
                   {Array.from({ length: 12 }, (_, index) => (
                     <option key={index} value={index + 1}>
                       {getMonthName(index + 1)}
@@ -226,7 +234,8 @@ export const ExcelSheetContent = () => {
               <div className="flex-1 mx-4">
                 <select
                   className="w-full bg-gray-200 p-2 rounded"
-                  value={invoice.year}>
+                  value={invoice.year}
+                >
                   {Array.from({ length: 11 }, (_, index) => (
                     <option key={index} value={invoice.year + index - 5}>
                       {invoice.year + index - 5}
@@ -302,13 +311,14 @@ export const ExcelSheetContent = () => {
             </div>
           </div>
         </div>
+        <button
+          className="mt-4 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
+          onClick={handleGenerateODF}
+        >
+          Generar Informe
+        </button>
       </div>
-      <button
-        className="mt-4 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
-        onClick={handleGenerateODF}>
-        Generar Informe
-      </button>
-    </div>
+    </ModalBase>
   );
 };
 

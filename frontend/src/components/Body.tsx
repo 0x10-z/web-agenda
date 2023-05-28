@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import { Modal } from "./Modal";
+import AppointmentModal from "./modals/AppointmentModal";
 import React from "react";
 import { User } from "models/User";
 import { Appointment } from "models/Appointment";
@@ -125,7 +125,6 @@ export default function Body({ user }: BodyProps) {
 
   const formattedDate = getCurrentIsoDate(selectedDate).substring(0, 10);
 
-  const modalTitle = selectedEvent ? "Actualizar" : "Crear";
   const modalProps = selectedEvent
     ? {
         onAccept: handleUpdateAppointment,
@@ -216,8 +215,7 @@ export default function Body({ user }: BodyProps) {
             Añadir
           </button>
         </div>
-        <Modal
-          title={modalTitle}
+        <AppointmentModal
           selectedDay={selectedDate}
           isOpen={isModalOpen}
           onClose={handleCloseModal}

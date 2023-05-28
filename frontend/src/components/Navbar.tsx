@@ -1,24 +1,39 @@
 import React, { useState } from "react";
-import ExcelSheet from "components/ExcelSheet/ExcelSheet";
+import { ExcelSheetModal } from "components/modals/ExcelSheetModal";
 import {
   faCut,
+  faDatabase,
   faFileExcel,
   faSignOutAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
+import { DbImporterModal } from "./modals/DbImporterModal";
 interface NavbarProps {
   handleLogout: () => void;
 }
 
 export default function Navbar({ handleLogout }: NavbarProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const handleOpenModal = (event?: React.MouseEvent<HTMLButtonElement>) => {
-    setIsModalOpen(true);
+  const [isExcelModalOpen, setIsExcelModalOpen] = useState(false);
+  const [isDbImportModalOpen, setIsDbImportModalOpen] = useState(false);
+
+  const handleOpenModalExcel = (
+    event?: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    setIsExcelModalOpen(true);
   };
 
   const handleCloseModal = () => {
-    setIsModalOpen(false);
+    setIsExcelModalOpen(false);
+  };
+
+  const handleOpenModalDbImport = (
+    event?: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    setIsDbImportModalOpen(true);
+  };
+
+  const handleCloseModalDbImport = () => {
+    setIsDbImportModalOpen(false);
   };
 
   return (
@@ -40,11 +55,19 @@ export default function Navbar({ handleLogout }: NavbarProps) {
         </div>
         <div className="flex dark:text-black">
           <button
-            onClick={handleOpenModal}
+            onClick={handleOpenModalExcel}
             className="btn  bg-green-500 hover:bg-green-700 text-white py-2 px-4 m-2 rounded"
           >
             <FontAwesomeIcon icon={faFileExcel} /> Crear hoja de cálculo
           </button>
+
+          <button
+            onClick={handleOpenModalDbImport}
+            className="btn  bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 m-2 rounded"
+          >
+            <FontAwesomeIcon icon={faDatabase} /> Importar DB
+          </button>
+
           <button
             onClick={handleLogout}
             className="btn  bg-red-500 hover:bg-red-700 text-white py-2 px-4 m-2 rounded"
@@ -53,7 +76,11 @@ export default function Navbar({ handleLogout }: NavbarProps) {
           </button>
         </div>
       </nav>
-      <ExcelSheet isOpen={isModalOpen} onClose={handleCloseModal} />
+      <ExcelSheetModal isOpen={isExcelModalOpen} onClose={handleCloseModal} />
+      <DbImporterModal
+        isOpen={isDbImportModalOpen}
+        onClose={handleCloseModalDbImport}
+      />
     </header>
   );
 }

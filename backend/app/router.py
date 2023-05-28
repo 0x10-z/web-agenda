@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, Query, File, UploadFile
 from sqlalchemy.orm import Session
 import os
 from dependencies import get_api_key, get_db
@@ -101,6 +101,32 @@ def appointments_post(
     else:
         response["error"] = "Message field is mandatory"
     return response
+
+
+import csv
+
+
+def process_csv(file_path):
+    with open(file_path, mode="r") as csv_file:
+        csv_reader = csv.DictReader(csv_file)
+        line_count = 0
+        for row in csv_reader:
+            if line_count == 0:
+                print(f'Columnas: {", ".join(row)}')
+                line_count += 1
+            print(row)
+            # print(f'{row["nombre"]} {row["apellido"]} tiene {row["edad"]} años.')
+            line_count += 1
+        print(f"Procesadas {line_count-1} filas en total.")
+
+
+@router.post("/import-db")
+async def upload_csv(file: UploadFile, db: Session = Depends(get_db)):
+    process_csv(file.file)
+    # for index, row in df.iterrows():
+    #    print("Creating {}".format(row))
+    # ModelAppointment.create(db,)
+    return {"message": "Archivo subido satisfactoriamente"}
 
 
 @router.get("/appointments")

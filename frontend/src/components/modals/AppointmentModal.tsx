@@ -7,7 +7,7 @@ import {
   getSelectedDateTime,
   getSelectedDateTimeString,
   showToast,
-} from "../utils/util";
+} from "../../utils/util";
 import { Appointment } from "models/Appointment";
 import {
   faTrash,
@@ -16,9 +16,9 @@ import {
   faPlusSquare,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import ModalBase from "./ModalBase";
 
-interface ModalProps {
-  title: string;
+interface AppointmentModalProps {
   selectedDay: Date;
   isOpen: boolean;
   onClose: () => void;
@@ -27,8 +27,7 @@ interface ModalProps {
   appointment?: Appointment;
 }
 
-export const Modal: React.FC<ModalProps> = ({
-  title,
+export const AppointmentModal: React.FC<AppointmentModalProps> = ({
   selectedDay,
   isOpen,
   onClose,
@@ -110,97 +109,80 @@ export const Modal: React.FC<ModalProps> = ({
     onClose();
   };
 
-  if (!isOpen) {
-    return null;
-  }
-
-  const handleOverlayClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    const target = event.target as HTMLDivElement;
-    if (target.id === "modal-overlay") {
-      onClose();
-    }
-  };
-
   return (
-    <div
-      className="fixed inset-0 flex items-center justify-center z-10 bg-black bg-opacity-50"
-      id="modal-overlay"
-      onClick={handleOverlayClick}
+    <ModalBase
+      title={appointment ? "Actualizar" : "Crear"}
+      isOpen={isOpen}
+      onClose={onClose}
+      size="xs"
     >
-      <div className="bg-white p-16 lg:w-1/3 md:w-1/2 flex flex-col justify-center items-center rounded-md shadow-md">
-        <h1 className="font-bold text-2xl text-gray-800 text-center pb-4">
-          {title}
-        </h1>
-        <Calendar
-          className="w-full mb-4 shadow-md"
-          value={selectedDate}
-          onClickDay={handleDayClick}
-          locale="es-ES"
-        />
-        {appointment && (
-          <input type="hidden" value={appointment.id} name="id" />
-        )}
-        <input
-          type="date"
-          value={formattedDate}
-          onChange={handleDateChange}
-          className="w-full border p-2 mb-2 shadow-md"
-          placeholder="Fecha"
-        />
-        <select
-          value={time.slice(0, 5)}
-          onChange={(e) => handleTimeChange(e)}
-          className="w-full border p-2 mb-2 shadow-md"
+      <Calendar
+        className="w-full mb-4 shadow-md"
+        value={selectedDate}
+        onClickDay={handleDayClick}
+        locale="es-ES"
+      />
+      {appointment && <input type="hidden" value={appointment.id} name="id" />}
+      <input
+        type="date"
+        value={formattedDate}
+        onChange={handleDateChange}
+        className="w-full border p-2 mb-2 shadow-md"
+        placeholder="Fecha"
+      />
+      <select
+        value={time.slice(0, 5)}
+        onChange={(e) => handleTimeChange(e)}
+        className="w-full border p-2 mb-2 shadow-md"
+      >
+        {timeOptions.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+      <textarea
+        autoFocus
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        className="w-full border p-2 mb-2 shadow-md"
+        placeholder="Descripción"
+      />
+      <div className="flex flex-row w-full justify-end mt-8">
+        <button
+          onClick={handleAccept}
+          className="bg-blue-500 text-white px-4 py-2 mx-1 rounded-md"
         >
-          {timeOptions.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-        <textarea
-          autoFocus
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="w-full border p-2 mb-2 shadow-md"
-          placeholder="Descripción"
-        />
-        <div className="flex flex-row w-full justify-end mt-8">
-          <button
-            onClick={handleAccept}
-            className="bg-blue-500 text-white px-4 py-2 mx-1 rounded-md"
-          >
-            {appointment ? (
-              <>
-                <FontAwesomeIcon icon={faSync} /> Actualizar
-              </>
-            ) : (
-              <>
-                <FontAwesomeIcon icon={faPlusSquare} /> Crear
-              </>
-            )}
-          </button>
-          <button
-            onClick={onClose}
-            className="bg-gray-500 text-white px-4 py-2 mx-1 rounded-md"
-          >
-            <FontAwesomeIcon icon={faArrowLeft} /> Volver
-          </button>
-          {appointment && onDelete && (
-            <button
-              onClick={() => onDelete(appointment.id)}
-              className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 mx-1 rounded-md"
-            >
-              <FontAwesomeIcon icon={faTrash} /> Eliminar
-            </button>
+          {appointment ? (
+            <>
+              <FontAwesomeIcon icon={faSync} /> Actualizar
+            </>
+          ) : (
+            <>
+              <FontAwesomeIcon icon={faPlusSquare} /> Crear
+            </>
           )}
-        </div>
+        </button>
+        <button
+          onClick={onClose}
+          className="bg-gray-500 text-white px-4 py-2 mx-1 rounded-md"
+        >
+          <FontAwesomeIcon icon={faArrowLeft} /> Volver
+        </button>
+        {appointment && onDelete && (
+          <button
+            onClick={() => onDelete(appointment.id)}
+            className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 mx-1 rounded-md"
+          >
+            <FontAwesomeIcon icon={faTrash} /> Eliminar
+          </button>
+        )}
       </div>
-    </div>
+    </ModalBase>
   );
 };
 
-export default Modal;
+export default AppointmentModal;
 
 function generateTimeSlots() {
   // Nuevo código para generar las opciones de tiempo de 30 minutos
