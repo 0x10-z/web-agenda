@@ -85,10 +85,10 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
     const currentDateTime = new Date();
     const selectedDateTime = getSelectedDateTime(selectedDate, time);
 
-    if (!appointment && selectedDateTime <= currentDateTime) {
-      showToast("La cita debe ser posterior al momento actual.", "info");
-      return;
-    }
+    // if (!appointment && selectedDateTime <= currentDateTime) {
+    //   showToast("La cita debe ser posterior al momento actual.", "info");
+    //   return;
+    // }
 
     if (description === "") {
       showToast("La cita debe contener una descripción", "info");

@@ -148,7 +148,7 @@ export default function Body({ user }: BodyProps) {
         onAccept: handleCreateAppointment,
       };
   return (
-    <div className="flex-grow mx-auto max-w-screen-lg ">
+    <div className="flex-grow mx-auto max-w-screen-lg">
       <div className="flex flex-col justify-around bg-white rounded-md h-full border border-slate-300">
         <div className="flex flex-row">
           <div className="flex-1">
@@ -213,16 +213,16 @@ export default function Body({ user }: BodyProps) {
             <img
               alt="h2u-logo-picture"
               src="/paredh2u.png"
-              width={600}
-              height={430}
+              width={400}
+              height={330}
               className="rounded-md shadow-sm"
             />
           </div>
         </div>
-        <div className="flex flex-col md:flex-row m-4">
+        <div className="flex flex-col md:flex-row mx-4 my-2">
           <button
             onClick={handleOpenModal}
-            className="flex-1 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 m-2 rounded"
+            className="flex-1 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
           >
             <FontAwesomeIcon icon={faPlusSquare} size="lg" className="mr-2" />
             Añadir

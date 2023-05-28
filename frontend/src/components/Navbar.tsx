@@ -38,7 +38,7 @@ export default function Navbar({ handleLogout }: NavbarProps) {
 
   return (
     <header className="text-gray-900 dark:text-white">
-      <nav className="border-b dark:border-gray-900 border-gray-200 container mx-auto flex flex-wrap items-center justify-between p-5">
+      <nav className="border-b dark:border-gray-900 border-gray-200 container mx-auto flex flex-wrap items-center justify-between">
         <div className="flex items-center">
           <img
             src="/favicon/android-chrome-192x192.png"
