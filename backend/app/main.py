@@ -5,9 +5,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from database import Base, SessionLocal, engine
-from models import create_initial_users
+from models import create_initial_users, move_old_appointments
 from router import router
-from middleware import custom_csrf_middleware, db_session_middleware
+from middleware import db_session_middleware
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -30,5 +30,6 @@ app.middleware("http")(db_session_middleware)
 
 Base.metadata.create_all(bind=engine)
 create_initial_users(SessionLocal())
+move_old_appointments(SessionLocal())
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=80)

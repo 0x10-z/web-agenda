@@ -79,18 +79,6 @@ def verify_password(password: str, hashed_password: str) -> bool:
     return pwdhash == stored_password
 
 
-def create_initial_users(db: Session):
-    if not User.exists(db):
-        User.create(
-            db,
-            username=os.getenv("DB_DEFAULT_USER"),
-            password=os.getenv("DB_DEFAULT_PASS"),
-        ),
-        print("Initial users created.")
-    else:
-        print("There are users in the database, initial users not created.")
-
-
 class Appointment(Base):
     __tablename__ = "appointments"
 
@@ -102,9 +90,18 @@ class Appointment(Base):
 
     def __init__(
         self,
+        user_id: int,
         description: str,
         appointment_datetime: datetime = None,
+        id: str = None,
+        created_at: datetime = None,
     ):
+        if id:
+            self.id = id
+        if created_at:
+            self.created_at = created_at
+        if user_id:
+            self.user_id = user_id
         self.description = description
         self.appointment_datetime = appointment_datetime or datetime.utcnow()
 
@@ -117,9 +114,10 @@ class Appointment(Base):
         )
 
         appointment = Appointment(
-            description=description, appointment_datetime=parsed_appointment_datetime
+            user_id=user_id,
+            description=description,
+            appointment_datetime=parsed_appointment_datetime,
         )
-        appointment.user_id = user_id
         db.add(appointment)
         db.commit()
         db.refresh(appointment)
@@ -162,15 +160,80 @@ class Appointment(Base):
 
     @classmethod
     def get_by_date(cls, db: Session, date: str, user_id: int) -> List["Appointment"]:
-        appointments_query = db.query(Appointment).filter_by(user_id=user_id)
-        appointments_query = appointments_query.filter(
-            func.date(Appointment.appointment_datetime) == date
+        import time
+
+        start_time = time.time()
+        join_query = db.query(Appointment).join(User).filter(User.id == user_id)
+        response = (
+            join_query.filter(func.date(Appointment.appointment_datetime) == date)
+            .order_by(func.time(Appointment.appointment_datetime))
+            .all()
         )
-        appointments_query = appointments_query.order_by(
-            func.time(Appointment.appointment_datetime)
-        )
-        return appointments_query.all()
+        end_time = time.time()
+        duration_ms = (end_time - start_time) * 1000
+        print(f"El método tardó {duration_ms:.2f} ms en ejecutarse")
+        return response
 
     @classmethod
     def get_all(cls, db: Session) -> List["Appointment"]:
         return db.query(cls).all()
+
+
+class HistoricalAppointment(Base):
+    __tablename__ = "historical_appointments"
+    id = Column(String, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    description = Column(String)
+    appointment_datetime = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    migrated_at = Column(DateTime, default=datetime.utcnow)
+
+    def __init__(
+        self,
+        id: str,
+        user_id: int,
+        description: str,
+        appointment_datetime: datetime,
+        created_at: datetime,
+    ):
+        self.id = id
+        self.created_at = created_at
+        self.user_id = user_id
+        self.description = description
+        self.appointment_datetime = appointment_datetime
+
+
+def move_old_appointments(db: Session):
+    date_condition = datetime(year=datetime.now().year, month=1, day=1)
+    old_appointments = (
+        db.query(Appointment)
+        .filter(Appointment.appointment_datetime < date_condition)
+        .all()
+    )
+    affected_rows = 0
+    for old_appointment in old_appointments:
+        historical_appointment = HistoricalAppointment(
+            id=old_appointment.id,
+            user_id=old_appointment.user_id,
+            description=old_appointment.description,
+            appointment_datetime=old_appointment.appointment_datetime,
+            created_at=old_appointment.created_at,
+        )
+        db.add(historical_appointment)
+        db.delete(old_appointment)
+        affected_rows += 1
+    db.commit()
+    db.close()
+    print("{} rows have been migrated".format(affected_rows))
+
+
+def create_initial_users(db: Session):
+    if not User.exists(db):
+        User.create(
+            db,
+            username=os.getenv("DB_DEFAULT_USER"),
+            password=os.getenv("DB_DEFAULT_PASS"),
+        ),
+        print("Initial users created.")
+    else:
+        print("There are users in the database, initial users not created.")

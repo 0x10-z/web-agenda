@@ -114,7 +114,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
       title={appointment ? "Actualizar" : "Crear"}
       isOpen={isOpen}
       onClose={onClose}
-      size="xs"
+      size="md"
     >
       <Calendar
         className="w-full mb-4 shadow-md"

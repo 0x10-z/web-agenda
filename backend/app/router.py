@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, Query, File, UploadFile
+from fastapi import APIRouter, HTTPException, Depends, Query, UploadFile, status
 from sqlalchemy.orm import Session
 import os
 from dependencies import get_api_key, get_db
@@ -7,12 +7,11 @@ from schemas import Appointment, Invoice, Login
 from datetime import datetime
 from sqlalchemy import func
 from dotenv import load_dotenv
-from fastapi import Request
 from odf.opendocument import OpenDocumentText
 from odf.text import P
 import calendar
 from datetime import timedelta
-import io
+from db_importer import process_csv
 from fastapi.responses import FileResponse
 
 load_dotenv()
@@ -103,30 +102,29 @@ def appointments_post(
     return response
 
 
-import csv
-
-
-def process_csv(file_path):
-    with open(file_path, mode="r") as csv_file:
-        csv_reader = csv.DictReader(csv_file)
-        line_count = 0
-        for row in csv_reader:
-            if line_count == 0:
-                print(f'Columnas: {", ".join(row)}')
-                line_count += 1
-            print(row)
-            # print(f'{row["nombre"]} {row["apellido"]} tiene {row["edad"]} años.')
-            line_count += 1
-        print(f"Procesadas {line_count-1} filas en total.")
-
-
 @router.post("/import-db")
-async def upload_csv(file: UploadFile, db: Session = Depends(get_db)):
-    process_csv(file.file)
-    # for index, row in df.iterrows():
-    #    print("Creating {}".format(row))
-    # ModelAppointment.create(db,)
-    return {"message": "Archivo subido satisfactoriamente"}
+async def upload_csv(
+    file: UploadFile, user: User = Depends(get_api_key), db: Session = Depends(get_db)
+):
+    response = {"success": False}
+
+    response["error"] = "Feature disabled by admin"
+    return response
+    try:
+        contents = await file.read()
+        rows = process_csv(contents, user.id, db, ModelAppointment)
+        if rows:
+            response["success"] = True
+            response["processed_rows"] = len(rows)
+            return response
+        else:
+            return response
+    except Exception as error:
+        print(error)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"No se ha podido procesar el archivo subido: {str(error)}",
+        )
 
 
 @router.get("/appointments")

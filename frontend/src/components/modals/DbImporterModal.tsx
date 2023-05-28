@@ -14,6 +14,7 @@ export const DbImporterModal: React.FC<DbImporterModalProps> = ({
   onClose,
 }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [dragging, setDragging] = useState<boolean>(false);
 
   useEffect(() => {
     const token = Auth.getToken();
@@ -26,6 +27,7 @@ export const DbImporterModal: React.FC<DbImporterModalProps> = ({
 
   const handleDrop = async (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
+    setDragging(false);
     const file = event.dataTransfer.files[0];
     await apiService.importDb(file);
   };
@@ -38,11 +40,20 @@ export const DbImporterModal: React.FC<DbImporterModalProps> = ({
       onClose={onClose}
     >
       <div
-        className="border-dashed border-2 border-gray-400 rounded-md p-4 w-full text-center"
+        className={`border-dashed border-2 border-gray-400 rounded-md p-4 w-full text-center 
+                    transition-all duration-500 ease-in-out transform hover:scale-125 
+                    ${dragging ? "bg-gray-200 scale-125" : ""}`}
         onDrop={handleDrop}
-        onDragOver={(event) => event.preventDefault()}
+        onDragOver={(event) => {
+          event.preventDefault();
+          event.dataTransfer.dropEffect = "copy";
+          setDragging(true);
+        }}
+        onDragLeave={() => setDragging(false)}
       >
-        Arrastra y suelta un archivo CSV aquí
+        <div className="pointer-events-auto">
+          Arrastra y suelta un archivo CSV aquí
+        </div>
       </div>
     </ModalBase>
   );

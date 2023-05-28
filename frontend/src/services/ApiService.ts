@@ -73,7 +73,17 @@ export class ApiService {
       });
 
       if (response.ok) {
-        showToast("Archivo importado satisfactoriamente", "success");
+        const data = await response.json();
+        if (data.success) {
+          showToast(
+            "Archivo importado satisfactoriamente. Se han añadido " +
+              data.processed_rows +
+              " entradas nuevas.",
+            "success"
+          );
+        } else {
+          showToast(data.error, "info");
+        }
       } else {
         showToast("No se ha podido importar la base de datos", "error");
       }
