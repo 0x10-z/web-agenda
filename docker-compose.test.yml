@@ -1,0 +1,44 @@
+services:
+  backend_agenda:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend_agenda
+    volumes:
+      - ./backend/app:/app:z
+    environment:
+      - USE_DOCKER=yes
+      - ALLOWED_ORIGINS=http://localhost:3000
+      - DB_DEFAULT_USER=user
+      - DB_DEFAULT_PASS=user
+    ports:
+      - "5000:80"
+      - "5678:5678" # debugpy
+    #command: "python -m debugpy --listen 0.0.0.0:5678 --wait-for-client /app/main.py --reload"
+
+  frontend_agenda:
+    build: ./frontend
+    image: frontend_agenda
+    container_name: frontend_agenda
+    volumes:
+      - ./frontend:/app:z
+    environment:
+      - USE_DOCKER=yes
+    ports:
+      - "3000:3000"
+
+  cypress:
+    build:
+      context: ./frontend/e2e
+      dockerfile: ./Dockerfile.test
+    image: cypress_test_agenda
+    environment:
+      CYPRESS_baseUrl: "http://frontend_agenda:3000"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./frontend/e2e/cypress:/app/cypress
+      - ./frontend/e2e/cypress.config.js:/app/cypress.config.js
+    command: npx cypress run
+    depends_on:
+      - frontend_agenda
