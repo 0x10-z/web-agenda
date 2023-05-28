@@ -108,8 +108,8 @@ async def upload_csv(
 ):
     response = {"success": False}
 
-    response["error"] = "Feature disabled by admin"
-    return response
+    # response["error"] = "Feature disabled by admin"
+    # return response
     try:
         contents = await file.read()
         rows = process_csv(contents, user.id, db, ModelAppointment)
