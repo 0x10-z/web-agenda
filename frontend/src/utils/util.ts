@@ -1,28 +1,32 @@
 import { toast } from "react-toastify";
 
-export const showToast = (message: string, type: "error" | "info" | "success") => {
+export const showToast = (
+  message: string,
+  type: "error" | "info" | "success"
+) => {
   const prefixedMessage =
-    type === "success" ? message : `${type.charAt(0).toUpperCase() + type.slice(1)}: ${message}`;
+    type === "success"
+      ? message
+      : `${type.charAt(0).toUpperCase() + type.slice(1)}: ${message}`;
 
   toast[type](prefixedMessage, {
+    toastId: "main-toast",
     position: window.innerWidth <= 768 ? "bottom-center" : "top-right",
   });
 };
 
-
 export const getCurrentIsoDate = (date: Date | null = null) => {
-  if (!date){
+  if (!date) {
     date = new Date();
   }
 
   const year = date.getFullYear();
-const month = String(date.getMonth() + 1).padStart(2, '0');
-const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
 
-const formattedDate = `${year}-${month}-${day}`;
-return formattedDate;
-}
-
+  const formattedDate = `${year}-${month}-${day}`;
+  return formattedDate;
+};
 
 export const getSelectedDateTime = (currentDate: Date, currentTime: string) => {
   return new Date(
@@ -34,7 +38,10 @@ export const getSelectedDateTime = (currentDate: Date, currentTime: string) => {
   );
 };
 
-export const getSelectedDateTimeString = (currentDate: Date, currentTime: string) => {
+export const getSelectedDateTimeString = (
+  currentDate: Date,
+  currentTime: string
+) => {
   const date = getSelectedDateTime(currentDate, currentTime);
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");

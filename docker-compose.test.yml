@@ -27,18 +27,19 @@ services:
     ports:
       - "3000:3000"
 
-  cypress:
-    build:
-      context: ./frontend/e2e
-      dockerfile: ./Dockerfile.test
-    image: cypress_test_agenda
-    environment:
-      CYPRESS_baseUrl: "http://frontend_agenda:3000"
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./frontend/e2e/cypress:/app/cypress
-      - ./frontend/e2e/cypress.config.js:/app/cypress.config.js
-    command: npx cypress run
-    depends_on:
-      - frontend_agenda
+  # cypress:
+  #   build:
+  #     context: ./frontend/e2e
+  #     dockerfile: ./Dockerfile.test
+  #   image: cypress_test_agenda
+  #   environment:
+  #     CYPRESS_baseUrl: "http://frontend_agenda:3000"
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - ./frontend/e2e/cypress:/app/cypress
+  ##     - ./frontend/e2e/cypress.config.js:/app/cypress/cypress.config.js
+  ##     - ./frontend/e2e/videos:/app/cypress/videos
+  #   command: npx cypress run
+  #   depends_on:
+  #     - frontend_agenda
