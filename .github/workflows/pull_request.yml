@@ -21,3 +21,15 @@ jobs:
       - name: E2E tests
         run: |
           docker-compose -f docker-compose.test.yml up
+
+      - name: Upload Screenshots
+        uses: actions/upload-artifact@v2
+        with:
+          name: e2e screenshots
+          path: frontend/e2e/cypress/screenshots/*
+
+      - name: Upload videos
+        uses: actions/upload-artifact@v2
+        with:
+          name: e2e videos
+          path: frontend/e2e/cypress/videos/*
