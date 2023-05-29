@@ -34,7 +34,7 @@ describe("Login", () => {
       .should("be.visible")
       .should(
         "contain",
-        "Error: El nombre de usuario o contraseña son incorrectos.."
+        "Error: El nombre de usuario o contraseña son incorrectos."
       );
   });
 });
