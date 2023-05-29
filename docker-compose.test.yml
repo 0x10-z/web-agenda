@@ -40,4 +40,4 @@ services:
       - ./frontend/e2e:/app
     #     - ./frontend/e2e/cypress.config.js:/app/cypress/cypress.config.js
     #     - ./frontend/e2e/videos:/app/cypress/videos
-    command: npx cypress run --browser chrome
+    command: npx cypress run --headless --browser chrome

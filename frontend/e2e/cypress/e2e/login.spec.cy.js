@@ -31,10 +31,10 @@ describe("Login", () => {
     // Verificación
     //cy.get('[data-testid="status-toaster"]')
     cy.get(`[id='main-toast']`)
+      .should("be.visible")
       .should(
         "contain",
         "Error: El nombre de usuario o contraseña son incorrectos."
-      )
-      .should("be.visible");
+      );
   });
 });
