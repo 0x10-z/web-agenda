@@ -203,29 +203,36 @@ export class ApiService {
     return null;
   }
 
-  static async login(username: string, password: string): Promise<User | null> {
+  static async login(
+    username: string,
+    password: string
+  ): Promise<User | null | undefined> {
     const baseUrl = Globals.API_URL;
-    const response = await fetch(baseUrl + "login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
-    if (response.ok) {
-      const data = await response.json();
-      if (data.success) {
-        return new User(
-          data.user.id,
-          data.token,
-          data.user.username,
-          data.user.appointments
-        );
+    try {
+      const response = await fetch(baseUrl + "login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          return new User(
+            data.user.id,
+            data.token,
+            data.user.username,
+            data.user.appointments
+          );
+        } else {
+          return null;
+        }
       } else {
-        return null;
+        throw new Error(
+          `Error sending message: ${response.status} ${response.statusText}`
+        );
       }
-    } else {
-      throw new Error(
-        `Error sending message: ${response.status} ${response.statusText}`
-      );
+    } catch (error: any) {
+      showToast(baseUrl + error.message, "error");
     }
   }
 
