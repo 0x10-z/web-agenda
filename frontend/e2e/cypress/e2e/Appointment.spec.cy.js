@@ -82,10 +82,8 @@ describe("Appointment", () => {
       cy.updateAppointment(
         appointment.day,
         appointment.hourIndex,
-        appointment.hour,
         appointment.description,
         appointment.newDay,
-        appointment.newHourIndex,
         appointment.newDescription
       );
 

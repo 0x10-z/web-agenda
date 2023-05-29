@@ -85,16 +85,6 @@ Cypress.Commands.add("appointmentExistsAt", (dayOfTheMonth, description) => {
     force: true,
   });
 
-  // cy.get("ul > li")
-  //   .should("exist")
-  //   .contains(
-  //     "li",
-  //     '[data-testid="' +
-  //       appointment.description +
-  //       "_" +
-  //       appointment.hour +
-  //       '"]'
-  //   );
   cy.get(`[data-testid="li-${description}"]`).should("be.visible");
 });
 
@@ -110,28 +100,15 @@ Cypress.Commands.add("openAppointmentModal", (dayOfTheMonth, description) => {
 
 Cypress.Commands.add(
   "updateAppointment",
-  (
-    dayOfTheMonth,
-    timeIndex,
-    hour,
-    description,
-    newDayOfTheMonth,
-    newTimeIndex,
-    newDescription
-  ) => {
+  (dayOfTheMonth, timeIndex, description, newDayOfTheMonth, newDescription) => {
+    // Open the modal of the appointment to update
     cy.openAppointmentModal(dayOfTheMonth, description);
 
-    // check
+    // Check if update mode is on and the description matches the initial one
     cy.get("h1").should("be.visible").should("contain", "Actualizar");
-    // cy.get("select[data-testid='select-value-"+timeIndex+"']")
-    //   .should("be.visible")
-    //   .should("have.value", timeIndex)
-    //   .find("option")
-    //   .eq(timeIndex)
-    //   .should("be:selected");
     cy.get("textarea").should("be.visible").should("contain", description);
 
-    // update
+    // Change the time, description and day
     cy.get("select").eq(0).select(timeIndex);
     cy.get("textarea").clear().type(newDescription);
     cy.get('[data-testid="modal-calendar-day-' + newDayOfTheMonth + '"]').click(
@@ -139,6 +116,8 @@ Cypress.Commands.add(
         force: true,
       }
     );
+
+    // Save the appointment changes and verify that they were successful
     cy.get('[data-testid="add-or-update-button"]').click();
     cy.checkToast("success");
   }
