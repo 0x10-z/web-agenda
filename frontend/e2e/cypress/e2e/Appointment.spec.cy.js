@@ -3,7 +3,7 @@ const appointments = [
     day: 17,
     hourIndex: 3,
     hour: "09:00",
-    description: "AAA",
+    description: "My appointment",
   },
   {
     day: 18,
@@ -90,45 +90,33 @@ describe("Appointment", () => {
       );
 
       // // assert
-      cy.appointmentExistsAt(
-        appointment.newDay,
-        appointment.hour,
-        appointment.newDescription
-      );
+      cy.appointmentExistsAt(appointment.newDay, appointment.newDescription);
 
       cy.url().should("include", "/");
     });
   });
 
-  // it("Add new appointment", () => {
-  //   // prepare
-  //   const username = "user";
-  //   const password = "user";
-  //   cy.login(username, password);
+  it("Add new appointment", () => {
+    // prepare
+    const username = "user";
+    const password = "user";
+    cy.login(username, password);
 
-  //   appointments.forEach((appointment) => {
-  //     // act
-  //     cy.addNewAppointment(
-  //       appointment.day,
-  //       appointment.hourIndex,
-  //       appointment.description
-  //     );
+    appointments.forEach((appointment) => {
+      // act
+      cy.addNewAppointment(
+        appointment.day,
+        appointment.hourIndex,
+        appointment.description
+      );
 
-  //     // assert
-  //     cy.appointmentExistsAt(
-  //       appointment.day,
-  //       appointment.hour,
-  //       appointment.description
-  //     );
+      // assert
+      cy.appointmentExistsAt(appointment.day, appointment.description);
 
-  //     // teardown
-  //     cy.deleteAppointment(
-  //       appointment.day,
-  //       appointment.hourIndex,
-  //       appointment.description
-  //     );
+      // teardown
+      cy.deleteAppointment(appointment.day, appointment.description);
 
-  //     cy.url().should("include", "/");
-  //   });
-  // });
+      cy.url().should("include", "/");
+    });
+  });
 });
