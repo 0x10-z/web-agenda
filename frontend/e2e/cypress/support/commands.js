@@ -71,38 +71,32 @@ Cypress.Commands.add(
   }
 );
 
-Cypress.Commands.add(
-  "deleteAppointment",
-  (dayOfTheMonth, hour, description) => {
-    cy.reload();
-    // Click appointment
-    cy.openAppointmentModal(dayOfTheMonth, hour, description);
+Cypress.Commands.add("deleteAppointment", (dayOfTheMonth, description) => {
+  cy.reload();
+  // Click appointment
+  cy.openAppointmentModal(dayOfTheMonth, description);
 
-    cy.get('[data-testid="delete-button"]').click();
-  }
-);
+  cy.get('[data-testid="delete-button"]').click();
+});
 
-Cypress.Commands.add(
-  "appointmentExistsAt",
-  (dayOfTheMonth, hour, description) => {
-    cy.reload();
-    cy.get(`[data-testid="main-calendar-day-${dayOfTheMonth}"]`).click({
-      force: true,
-    });
+Cypress.Commands.add("appointmentExistsAt", (dayOfTheMonth, description) => {
+  cy.reload();
+  cy.get(`[data-testid="main-calendar-day-${dayOfTheMonth}"]`).click({
+    force: true,
+  });
 
-    // cy.get("ul > li")
-    //   .should("exist")
-    //   .contains(
-    //     "li",
-    //     '[data-testid="' +
-    //       appointment.description +
-    //       "_" +
-    //       appointment.hour +
-    //       '"]'
-    //   );
-    cy.get(`[data-testid="li-${description}"]`).should("be.visible");
-  }
-);
+  // cy.get("ul > li")
+  //   .should("exist")
+  //   .contains(
+  //     "li",
+  //     '[data-testid="' +
+  //       appointment.description +
+  //       "_" +
+  //       appointment.hour +
+  //       '"]'
+  //   );
+  cy.get(`[data-testid="li-${description}"]`).should("be.visible");
+});
 
 Cypress.Commands.add("openAppointmentModal", (dayOfTheMonth, description) => {
   cy.reload();
