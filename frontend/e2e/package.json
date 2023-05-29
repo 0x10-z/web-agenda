@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "Gleb Bahmutov <gleb.bahmutov@gmail.com> (https://glebbahmutov.com/)",
+  "author": "Iker Ocio (https:ikerocio.com/)",
   "license": "ISC",
   "private": true,
   "devDependencies": {
