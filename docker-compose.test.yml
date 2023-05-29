@@ -23,6 +23,8 @@ services:
     environment:
       - USE_DOCKER=yes
       - REACT_APP_API_URL=http://backend_agenda:80/ # Port 80 because we are hitting to container directly, not host
+    depends_on:
+      - backend_agenda
     ports:
       - "3000:3000"
 
@@ -37,4 +39,6 @@ services:
       - "8080:8080"
     volumes:
       - ./frontend/e2e:/app
+    depends_on:
+      - frontend_agenda
     command: npx cypress run --headless --browser chrome
