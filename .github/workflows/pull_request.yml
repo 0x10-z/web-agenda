@@ -20,7 +20,7 @@ jobs:
 
       - name: E2E tests
         run: |
-          docker-compose -f docker-compose.test.yml up
+          docker-compose -f docker-compose.test.yml up cypress
 
       - name: Upload Screenshots
         uses: actions/upload-artifact@v2
