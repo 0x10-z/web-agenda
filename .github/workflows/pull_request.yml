@@ -24,14 +24,14 @@ jobs:
         if: ${{ success() }}
 
       - name: Upload Screenshots
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: e2e screenshots
           path: frontend/e2e/cypress/screenshots/*
         if: ${{ always() }}
 
       - name: Upload videos
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: e2e videos
           path: frontend/e2e/cypress/videos/*
