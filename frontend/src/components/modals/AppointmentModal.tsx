@@ -109,6 +109,12 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
     onClose();
   };
 
+  function testTileContent({ date }: { date: Date }) {
+    const dateSuffix = date.getDate();
+
+    return <i data-testid={`modal-calendar-day-${dateSuffix}`} />;
+  }
+
   return (
     <ModalBase
       title={appointment ? "Actualizar" : "Crear"}
@@ -121,6 +127,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
         value={selectedDate}
         onClickDay={handleDayClick}
         locale="es-ES"
+        tileContent={testTileContent}
       />
       {appointment && <input type="hidden" value={appointment.id} name="id" />}
       <input
@@ -135,8 +142,12 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
         onChange={(e) => handleTimeChange(e)}
         className="w-full border p-2 mb-2 shadow-md"
       >
-        {timeOptions.map((option) => (
-          <option key={option} value={option}>
+        {timeOptions.map((option, index) => (
+          <option
+            key={option}
+            data-testid={`select-value-${index}`}
+            value={option}
+          >
             {option}
           </option>
         ))}
@@ -152,6 +163,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
         <button
           onClick={handleAccept}
           className="bg-blue-500 text-white px-4 py-2 mx-1 rounded-md"
+          data-testid="add-or-update-button"
         >
           {appointment ? (
             <>
@@ -166,6 +178,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
         <button
           onClick={onClose}
           className="bg-gray-500 text-white px-4 py-2 mx-1 rounded-md"
+          data-testid="close-button"
         >
           <FontAwesomeIcon icon={faArrowLeft} /> Volver
         </button>
@@ -173,6 +186,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
           <button
             onClick={() => onDelete(appointment.id)}
             className="bg-red-500 hover:bg-red-700 text-white px-4 py-2 mx-1 rounded-md"
+            data-testid="delete-button"
           >
             <FontAwesomeIcon icon={faTrash} /> Eliminar
           </button>

@@ -124,12 +124,15 @@ export default function Body({ user }: BodyProps) {
           appointments < 5 ? "green" : appointments < 9 ? "orange" : "red";
 
         return (
-          <FontAwesomeIcon
-            icon={faTag}
-            size="sm"
-            className="mt-1 ml-1"
-            style={{ color: tagColor }}
-          />
+          <>
+            <FontAwesomeIcon
+              icon={faTag}
+              size="sm"
+              className="mt-1 ml-1"
+              style={{ color: tagColor }}
+            />
+            <i data-testid={`main-calendar-day-${dayOfMonth}`} />
+          </>
         );
         //return "🔖";
       }
@@ -178,6 +181,7 @@ export default function Body({ user }: BodyProps) {
                       className={`rounded p-2 hover:bg-gray-700 hover:text-white hover:cursor-pointer ${
                         index % 2 === 0 ? "bg-white" : "bg-gray-200"
                       }`}
+                      data-testid={`li-${event.description}`}
                     >
                       {index + 1} - {event.description} - {event.localeTime()}
                     </li>
@@ -223,6 +227,7 @@ export default function Body({ user }: BodyProps) {
           <button
             onClick={handleOpenModal}
             className="flex-1 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded"
+            data-testid="add-button"
           >
             <FontAwesomeIcon icon={faPlusSquare} size="lg" className="mr-2" />
             Añadir

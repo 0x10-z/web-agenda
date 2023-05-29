@@ -32,3 +32,130 @@ Cypress.Commands.add("login", (username, password) => {
   });
   cy.url().should("include", "/");
 });
+
+Cypress.Commands.add("checkToast", (type) => {
+  var title = "";
+  switch (type) {
+    case "info":
+      title = "Info: ";
+
+      cy.get(`[id='main-toast']`).should("be.visible").should("contain", title);
+      break;
+
+    case "error":
+      title = "Error: ";
+      cy.get(`[id='main-toast']`).should("be.visible").should("contain", title);
+      break;
+
+    case "success":
+      cy.get(`[id='main-toast']`).should("be.visible");
+      break;
+  }
+});
+
+Cypress.Commands.add(
+  "addNewAppointment",
+  (dayOfTheMonth, timeIndex, description) => {
+    cy.get('[data-testid="add-button"]').click();
+    // Click on calendar
+    cy.get('[data-testid="modal-calendar-day-' + dayOfTheMonth + '"]').click({
+      force: true,
+    });
+    // Click on time
+    cy.get("select").eq(0).select(timeIndex);
+    // Write description
+    cy.get("textarea").type(description);
+    cy.get('[data-testid="add-or-update-button"]').click();
+    //cy.refreshCalendar(dayOfTheMonth);
+    cy.checkToast("success");
+  }
+);
+
+Cypress.Commands.add(
+  "deleteAppointment",
+  (dayOfTheMonth, hour, description) => {
+    cy.reload();
+    // Click appointment
+    cy.openAppointmentModal(dayOfTheMonth, hour, description);
+
+    cy.get('[data-testid="delete-button"]').click();
+  }
+);
+
+Cypress.Commands.add(
+  "appointmentExistsAt",
+  (dayOfTheMonth, hour, description) => {
+    cy.reload();
+    cy.get(`[data-testid="main-calendar-day-${dayOfTheMonth}"]`).click({
+      force: true,
+    });
+
+    // cy.get("ul > li")
+    //   .should("exist")
+    //   .contains(
+    //     "li",
+    //     '[data-testid="' +
+    //       appointment.description +
+    //       "_" +
+    //       appointment.hour +
+    //       '"]'
+    //   );
+    cy.get(`[data-testid="li-${description}"]`).should("be.visible");
+  }
+);
+
+Cypress.Commands.add("openAppointmentModal", (dayOfTheMonth, description) => {
+  cy.reload();
+  cy.get(`[data-testid="main-calendar-day-${dayOfTheMonth}"]`).click({
+    force: true,
+  });
+
+  cy.get(`[data-testid="li-${description}"]`).should("exist");
+  cy.get(`[data-testid="li-${description}"]`).click();
+});
+
+Cypress.Commands.add(
+  "updateAppointment",
+  (
+    dayOfTheMonth,
+    timeIndex,
+    hour,
+    description,
+    newDayOfTheMonth,
+    newTimeIndex,
+    newDescription
+  ) => {
+    cy.openAppointmentModal(dayOfTheMonth, description);
+
+    // check
+    cy.get("h1").should("be.visible").should("contain", "Actualizar");
+    // cy.get("select[data-testid='select-value-"+timeIndex+"']")
+    //   .should("be.visible")
+    //   .should("have.value", timeIndex)
+    //   .find("option")
+    //   .eq(timeIndex)
+    //   .should("be:selected");
+    cy.get("textarea").should("be.visible").should("contain", description);
+
+    // update
+    cy.get("select").eq(0).select(timeIndex);
+    cy.get("textarea").clear().type(newDescription);
+    cy.get('[data-testid="modal-calendar-day-' + newDayOfTheMonth + '"]').click(
+      {
+        force: true,
+      }
+    );
+    cy.get('[data-testid="add-or-update-button"]').click();
+    cy.checkToast("success");
+  }
+);
+
+Cypress.Commands.add("addModalIsOpening", () => {
+  cy.get('[data-testid="add-button"]').click();
+  cy.get("h1").should("be.visible").should("contain", "Crear");
+});
+
+Cypress.Commands.add("addModalIsClosing", () => {
+  cy.get("h1").should("be.visible").should("contain", "Crear");
+  cy.get('[data-testid="close-button"]').click();
+});
