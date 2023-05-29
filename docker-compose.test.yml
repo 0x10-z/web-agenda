@@ -4,8 +4,8 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: backend_agenda
-    volumes:
-      - ./backend/app:/app:z
+    #volumes:
+    #  - ./backend/app:/app:z
     environment:
       - USE_DOCKER=yes
       - ALLOWED_ORIGINS=http://frontend_agenda:3000 # Cors updated to let Cypress make requests
@@ -18,8 +18,8 @@ services:
     build: ./frontend
     image: frontend_agenda
     container_name: frontend_agenda
-    volumes:
-      - ./frontend:/app:z
+    #volumes:
+    #  - ./frontend:/app:z
     environment:
       - USE_DOCKER=yes
       - REACT_APP_API_URL=http://backend_agenda:80/ # Port 80 because we are hitting to container directly, not host
