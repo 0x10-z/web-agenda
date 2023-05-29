@@ -1,0 +1,23 @@
+name: Merge to master
+on:
+  pull_request:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:23.0-dind
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Prepare env files
+        run: |
+          current_date=$(date +'%y.%m.%d-%H%M%S')
+          echo REACT_APP_API_URL=https://agenda-back.ikerocio.com/ > ./frontend/.env.local
+          echo REACT_APP_VERSION=$current_date >> ./frontend/.env.local
+          echo APP_VERSION=$current_date > ./backend/.env
+
+      - name: E2E tests
+        run: |
+          docker-compose -f docker-compose.test.yml up
