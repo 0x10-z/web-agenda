@@ -14,18 +14,11 @@ function LoginForm({ onLoginSuccess }: LoginProps) {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    try {
-      const user = await ApiService.login(username, password);
-      if (user) {
-        onLoginSuccess(user);
-      } else {
-        showToast(
-          "El nombre de usuario o contraseña son incorrectos.",
-          "error"
-        );
-      }
-    } catch (error: any) {
-      alert(`Ocurrió un error: ${error.message}`);
+    const user = await ApiService.login(username, password);
+    if (user) {
+      onLoginSuccess(user);
+    } else {
+      showToast("El nombre de usuario o contraseña son incorrectos.", "error");
     }
   };
 
@@ -47,8 +40,7 @@ function LoginForm({ onLoginSuccess }: LoginProps) {
           <div className="mb-4">
             <label
               className="block text-gray-700 font-bold mb-2"
-              htmlFor="username"
-            >
+              htmlFor="username">
               Usuario
             </label>
             <input
@@ -66,8 +58,7 @@ function LoginForm({ onLoginSuccess }: LoginProps) {
           <div className="mb-4">
             <label
               className="block text-gray-700 font-bold mb-2"
-              htmlFor="password"
-            >
+              htmlFor="password">
               Contraseña
             </label>
             <input
@@ -84,8 +75,7 @@ function LoginForm({ onLoginSuccess }: LoginProps) {
           <div className="flex items-center justify-between">
             <button
               className="bg-pink-500 w-full hover:bg-pink-700 text-white font-bold py-2 px-4 focus:outline-none focus:shadow-outline"
-              type="submit"
-            >
+              type="submit">
               Iniciar sesión
             </button>
           </div>

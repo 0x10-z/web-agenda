@@ -25,6 +25,10 @@ jobs:
           echo REACT_APP_VERSION=$current_date >> ./frontend/.env.local
           echo APP_VERSION=$current_date > ./backend/.env
 
+      - name: E2E tests
+        run: |
+          docker-compose -f docker-compose.test.yml up
+
       - name: Build and push Docker Compose
         run: |
           docker-compose -f docker-compose.build.yml build
