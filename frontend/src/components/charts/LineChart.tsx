@@ -88,14 +88,19 @@ const groupAppointmentsByYear = (appointments: Appointment[]): ChartData => {
     {}
   );
 
-  const dataSets = Object.entries(yearsData).map(([year, yearData]) => {
-    return {
-      label: year,
-      data: yearData.map((d) => d.count),
-      borderColor: getRandomColor(),
-      fill: false,
-    };
-  });
+  const dataSets = Object.entries(yearsData).map(
+    ([year, yearData], index, array) => {
+      const datasetHidden = index < array.length - 4; // Establecer el valor de hidden en true excepto para los últimos 4
+
+      return {
+        label: year,
+        data: yearData.map((d) => d.count),
+        borderColor: getRandomColor(),
+        fill: false,
+        hidden: datasetHidden,
+      };
+    }
+  );
 
   return {
     labels: [

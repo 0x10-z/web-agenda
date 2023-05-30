@@ -15,7 +15,7 @@ interface NavbarProps {
 }
 
 export default function Navbar({ handleLogout }: NavbarProps) {
-  const [isStatsModalOpen, setIsStatsModalOpen] = useState(true);
+  const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
   const [isExcelModalOpen, setIsExcelModalOpen] = useState(false);
   const [isDbImportModalOpen, setIsDbImportModalOpen] = useState(false);
 

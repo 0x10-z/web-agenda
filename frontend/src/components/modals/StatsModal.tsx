@@ -25,7 +25,6 @@ export const StatsModal: React.FC<StatsProps> = ({ isOpen, onClose }) => {
             <Toggle
               checked={isLineChart}
               onChange={() => setIsLineChart(!isLineChart)}
-              name="Linea/Barras"
             />
           </div>
           {isLineChart ? <LineChart /> : <BarChart />}
