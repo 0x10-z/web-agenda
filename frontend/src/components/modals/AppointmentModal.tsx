@@ -157,6 +157,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
         onChange={(e) => setDescription(e.target.value)}
         className="w-full border border-gray-400 p-2 mb-2 shadow-md"
         placeholder="Descripción"
+        rows={7}
       />
       <div className="flex flex-row w-full justify-end mt-8">
         <button
