@@ -1,9 +1,14 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, date
 from typing import Optional
 from decimal import Decimal
 
 from pydantic import BaseModel, validator
+
+
+class AppointmentCount(BaseModel):
+    date: str
+    count: int
 
 
 class Entry(BaseModel):
