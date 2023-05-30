@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react";
 import { Line } from "react-chartjs-2";
 import { ChartDataset } from "chart.js";
+import { ApiService } from "services/ApiService";
+import { User } from "models/User";
+import { Auth } from "utils/auth";
 
 interface ChartData {
   labels: string[];
   datasets: { label: string; data: number[] }[];
 }
 
-interface Appointment {
+interface AppointmentCount {
   id: number;
   date: string;
   count: number;
@@ -33,9 +36,20 @@ const LineChart = () => {
     datasets: [],
   });
 
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const token = Auth.getToken();
+    if (token) {
+      setUser(token);
+    }
+  }, []);
+
+  const apiService = new ApiService(user!);
+
   useEffect(() => {
     (async () => {
-      const appointments = await fetchAppointmentsData();
+      const appointments = await apiService.fetchStatisticsAppointmentData();
       const groupedAppointments = groupAppointmentsByYear(appointments);
       setChartData(groupedAppointments);
     })();
@@ -66,14 +80,10 @@ const LineChart = () => {
 
 export default LineChart;
 
-const fetchAppointmentsData = async (): Promise<Appointment[]> => {
-  const response = await fetch("http://localhost:5000/stats/appointment_all");
-  const data = await response.json();
-  return data as Appointment[];
-};
-
-const groupAppointmentsByYear = (appointments: Appointment[]): ChartData => {
-  const yearsData = appointments.reduce<Record<string, Appointment[]>>(
+const groupAppointmentsByYear = (
+  appointments: AppointmentCount[]
+): ChartData => {
+  const yearsData = appointments.reduce<Record<string, AppointmentCount[]>>(
     (acc, cur) => {
       const year = new Date(cur.date).getFullYear().toString();
 

@@ -1,6 +1,9 @@
+import { User } from "models/User";
 import React, { useState, useEffect } from "react";
 import { Bar } from "react-chartjs-2";
 import DatePicker, { ReactDatePickerProps } from "react-datepicker";
+import { ApiService } from "services/ApiService";
+import { Auth } from "utils/auth";
 
 interface Data {
   labels: string[];
@@ -20,13 +23,22 @@ const BarChart = () => {
     ],
   });
 
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const token = Auth.getToken();
+    if (token) {
+      setUser(token);
+    }
+  }, []);
+
+  const apiService = new ApiService(user!);
+
   const fetchChartData = async () => {
-    const response = await fetch(
-      `http://localhost:5000/stats/appointment_count?date_from=${getFormattedDate(
-        fromDate
-      )}&date_to=${getFormattedDate(toDate)}`
+    const data = await apiService.fetchStatisticsAppointmentBetweenDates(
+      fromDate,
+      toDate
     );
-    const data = await response.json();
 
     const labels = data.map((d: any) => d.date);
     const values = data.map((d: any) => d.count);
@@ -112,7 +124,3 @@ const BarChart = () => {
 };
 
 export default BarChart;
-
-function getFormattedDate(date: Date) {
-  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-}

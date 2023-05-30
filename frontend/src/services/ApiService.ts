@@ -9,6 +9,12 @@ import { Globals } from "Globals";
 import { toast } from "react-toastify";
 import { Invoice } from "models/Invoice";
 
+interface AppointmentCount {
+  id: number;
+  date: string;
+  count: number;
+}
+
 export class ApiService {
   private readonly baseUrl: string = Globals.API_URL;
   private readonly user: User;
@@ -181,6 +187,25 @@ export class ApiService {
     return null;
   }
 
+  async fetchStatisticsAppointmentData(): Promise<AppointmentCount[]> {
+    const response = await fetch(`${this.baseUrl}stats/appointment_all`);
+    const data = await response.json();
+    return data as AppointmentCount[];
+  }
+
+  async fetchStatisticsAppointmentBetweenDates(
+    fromDate: Date,
+    toDate: Date
+  ): Promise<{}[]> {
+    const response = await fetch(
+      `${this.baseUrl}stats/appointment_count?date_from=${getFormattedDate(
+        fromDate
+      )}&date_to=${getFormattedDate(toDate)}`
+    );
+    const data = await response.json();
+    return data;
+  }
+
   async deleteAppointment(appointment_id: string) {
     const url = `${this.baseUrl}appointments/${appointment_id}`;
 
@@ -250,4 +275,8 @@ export class ApiService {
       );
     }
   }
+}
+
+function getFormattedDate(date: Date) {
+  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
 }
