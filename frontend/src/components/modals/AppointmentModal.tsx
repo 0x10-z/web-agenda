@@ -133,13 +133,13 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
         type="date"
         value={formattedDate}
         onChange={handleDateChange}
-        className="w-full border border-gray-400 p-2 mb-2 shadow-md"
+        className="w-full border border-gray-500 p-2 mb-2 shadow-md"
         placeholder="Fecha"
       />
       <select
         value={time.slice(0, 5)}
         onChange={(e) => handleTimeChange(e)}
-        className="w-full border border-gray-400 p-2 mb-2 shadow-md"
+        className="w-full border border-gray-500 p-2 mb-2 shadow-md"
       >
         {timeOptions.map((option, index) => (
           <option
@@ -155,7 +155,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
         autoFocus
         value={description}
         onChange={(e) => setDescription(e.target.value)}
-        className="w-full border border-gray-400 p-2 mb-2 shadow-md"
+        className="w-full border border-gray-500 p-2 mb-2 shadow-md"
         placeholder="Descripción"
         rows={7}
       />
