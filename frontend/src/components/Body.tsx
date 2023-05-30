@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
+import "Calendar.css";
 import AppointmentModal from "./modals/AppointmentModal";
 import React from "react";
 import { User } from "models/User";
