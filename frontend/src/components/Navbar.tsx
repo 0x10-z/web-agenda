@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { ExcelSheetModal } from "components/modals/ExcelSheetModal";
 import {
+  faChartBar,
   faCut,
   faDatabase,
   faFileExcel,
@@ -8,13 +9,25 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { DbImporterModal } from "./modals/DbImporterModal";
+import { StatsModal } from "./modals/StatsModal";
 interface NavbarProps {
   handleLogout: () => void;
 }
 
 export default function Navbar({ handleLogout }: NavbarProps) {
+  const [isStatsModalOpen, setIsStatsModalOpen] = useState(true);
   const [isExcelModalOpen, setIsExcelModalOpen] = useState(false);
   const [isDbImportModalOpen, setIsDbImportModalOpen] = useState(false);
+
+  const handleOpenModalStats = (
+    event?: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    setIsStatsModalOpen(true);
+  };
+
+  const handleStatsCloseModal = () => {
+    setIsStatsModalOpen(false);
+  };
 
   const handleOpenModalExcel = (
     event?: React.MouseEvent<HTMLButtonElement>
@@ -22,7 +35,7 @@ export default function Navbar({ handleLogout }: NavbarProps) {
     setIsExcelModalOpen(true);
   };
 
-  const handleCloseModal = () => {
+  const handleExcelCloseModal = () => {
     setIsExcelModalOpen(false);
   };
 
@@ -55,6 +68,13 @@ export default function Navbar({ handleLogout }: NavbarProps) {
         </div>
         <div className="flex dark:text-black">
           <button
+            onClick={handleOpenModalStats}
+            className="btn  bg-orange-500 hover:bg-orange-700 text-white py-2 px-4 m-2 rounded"
+          >
+            <FontAwesomeIcon icon={faChartBar} /> Estadisticas
+          </button>
+
+          <button
             onClick={handleOpenModalExcel}
             className="btn  bg-green-500 hover:bg-green-700 text-white py-2 px-4 m-2 rounded"
           >
@@ -76,7 +96,11 @@ export default function Navbar({ handleLogout }: NavbarProps) {
           </button>
         </div>
       </nav>
-      <ExcelSheetModal isOpen={isExcelModalOpen} onClose={handleCloseModal} />
+      <StatsModal isOpen={isStatsModalOpen} onClose={handleStatsCloseModal} />
+      <ExcelSheetModal
+        isOpen={isExcelModalOpen}
+        onClose={handleExcelCloseModal}
+      />
       <DbImporterModal
         isOpen={isDbImportModalOpen}
         onClose={handleCloseModalDbImport}

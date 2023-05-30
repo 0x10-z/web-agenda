@@ -2,10 +2,10 @@ from fastapi import APIRouter, HTTPException, Depends, Query, UploadFile, status
 from sqlalchemy.orm import Session
 import os
 from dependencies import get_api_key, get_db
-from models import User, Appointment as ModelAppointment
-from schemas import Appointment, Invoice, Login
-from datetime import datetime
-from sqlalchemy import func
+from models import User, Appointment as ModelAppointment, HistoricalAppointment
+from schemas import Appointment, Invoice, Login, AppointmentCount
+from datetime import datetime, date
+from sqlalchemy import func, union_all
 from dotenv import load_dotenv
 from odf.opendocument import OpenDocumentText
 from odf.text import P
@@ -13,6 +13,7 @@ import calendar
 from datetime import timedelta
 from db_importer import process_csv
 from fastapi.responses import FileResponse
+from typing import List
 
 load_dotenv()
 
@@ -187,6 +188,125 @@ def get_monthly_appointments(
 
     appointments_by_day = get_month_appointments(month, year, user, db)
     return appointments_by_day
+
+
+@router.get("/stats/appointment_count", response_model=List[AppointmentCount])
+def get_appointment_count(
+    date_from: date, date_to: date, db: Session = Depends(get_db)
+):
+    """
+    Obtiene el recuento de citas creadas en un intervalo de fechas, agrupado por mes o año según el tamaño de intervalo proporcionado.
+    """
+    days_interval = 1000  # if interval is less than this value, data would be grouped by month. Else, by year.
+    delta = date_to - date_from
+    print(delta)
+    if delta <= timedelta(days=days_interval):
+        # Group by month
+        model_query = (
+            db.query(
+                func.strftime("%Y-%m", ModelAppointment.appointment_datetime).label(
+                    "date"
+                ),
+                func.count().label("count"),
+            )
+            .filter(
+                ModelAppointment.appointment_datetime >= date_from,
+                ModelAppointment.appointment_datetime < date_to,
+            )
+            .group_by("date")
+        )
+
+        historic_query = (
+            db.query(
+                func.strftime(
+                    "%Y-%m", HistoricalAppointment.appointment_datetime
+                ).label("date"),
+                func.count().label("count"),
+            )
+            .filter(
+                HistoricalAppointment.appointment_datetime >= date_from,
+                HistoricalAppointment.appointment_datetime < date_to,
+            )
+            .group_by("date")
+        )
+    else:
+        # Group by year
+        model_query = (
+            db.query(
+                func.strftime("%Y", ModelAppointment.appointment_datetime).label(
+                    "date"
+                ),
+                func.count().label("count"),
+            )
+            .filter(
+                ModelAppointment.appointment_datetime >= date_from,
+                ModelAppointment.appointment_datetime < date_to,
+            )
+            .group_by("date")
+        )
+        historic_query = (
+            db.query(
+                func.strftime("%Y", HistoricalAppointment.appointment_datetime).label(
+                    "date"
+                ),
+                func.count().label("count"),
+            )
+            .filter(
+                HistoricalAppointment.appointment_datetime >= date_from,
+                HistoricalAppointment.appointment_datetime < date_to,
+            )
+            .group_by("date")
+        )
+
+    sub_query = union_all(model_query, historic_query).subquery()
+
+    query = (
+        db.query(
+            sub_query.c.date,
+            sub_query.c.count,
+        )
+        .group_by(sub_query.c.date)
+        .order_by(sub_query.c.date)
+    )
+
+    results = query.all()
+    appointment_count = []
+    for r in results:
+        appointment_count.append({"date": r.date, "count": r.count})
+
+    return appointment_count
+
+
+@router.get("/stats/appointment_all", response_model=List[AppointmentCount])
+def get_all_appointment_count(db: Session = Depends(get_db)):
+    model_query = db.query(
+        func.strftime("%Y-%m", ModelAppointment.appointment_datetime).label("date"),
+        func.count().label("count"),
+    ).group_by("date")
+
+    historic_query = db.query(
+        func.strftime("%Y-%m", HistoricalAppointment.appointment_datetime).label(
+            "date"
+        ),
+        func.count().label("count"),
+    ).group_by("date")
+
+    sub_query = union_all(model_query, historic_query).subquery()
+
+    query = (
+        db.query(
+            sub_query.c.date,
+            sub_query.c.count,
+        )
+        .group_by(sub_query.c.date)
+        .order_by(sub_query.c.date)
+    )
+
+    results = query.all()
+    appointment_count = []
+    for r in results:
+        appointment_count.append({"date": r.date, "count": r.count})
+    return appointment_count
 
 
 @router.get("/")
