@@ -8,7 +8,7 @@ services:
     #  - ./backend/app:/app:z
     environment:
       - USE_DOCKER=yes
-      - ALLOWED_ORIGINS=http://frontend_agenda:3000,http://localhost:3000 # Cors updated to let Cypress make requests
+      - ALLOWED_ORIGINS=http://frontend_agenda:80,http://localhost:3000 # Cors updated to let Cypress make requests
       - DB_DEFAULT_USER=user
       - DB_DEFAULT_PASS=user
     ports:
@@ -24,8 +24,8 @@ services:
     #  - ./frontend:/app:z
     environment:
       - USE_DOCKER=yes
-      #- REACT_APP_API_URL=http://backend_agenda:80/ # Port 80 because we are hitting to container directly, not host
-      - REACT_APP_API_URL=http://localhost:5000/ # Port 80 because we are hitting to container directly, not host
+      - REACT_APP_API_URL=http://backend_agenda:80/ # Port 80 because we are hitting to container directly, not host
+      #- REACT_APP_API_URL=http://localhost:5000/ # Port 80 because we are hitting to container directly, not host
     depends_on:
       - backend_agenda
     ports:
@@ -37,11 +37,11 @@ services:
       dockerfile: ./Dockerfile.test
     image: cypress_test_agenda
     environment:
-      CYPRESS_baseUrl: "http://frontend_agenda:3000"
+      CYPRESS_baseUrl: "http://frontend_agenda:80"
     ports:
       - "8080:8080"
     volumes:
       - ./frontend/e2e:/app
     depends_on:
       - frontend_agenda
-    command: npx cypress run --headless --browser chrome
+    command: npx cypress run --browser chrome
