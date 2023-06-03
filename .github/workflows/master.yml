@@ -30,13 +30,10 @@ jobs:
           docker-compose -f docker-compose.test.yml up -d frontend_agenda backend_agenda
 
       - name: E2E tests
-        uses: cypress-io/github-action@v5
-        with:
-          browser: chrome
-          project: ./frontend/e2e/
-          spec: ./frontend/e2e/cypress/*.spec.cy.js
-        #run: |
-        #  docker-compose -f docker-compose.test.yml up --abort-on-container-exit cypress
+        run: |
+          cd frontend/e2e
+          npm install
+          npx cypress run --headless --browser chrome
         if: ${{ success() }}
 
       - name: Upload Screenshots
