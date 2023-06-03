@@ -15,7 +15,9 @@ services:
       - "5000:80"
 
   frontend_agenda:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
     image: frontend_agenda
     container_name: frontend_agenda
     #volumes:
@@ -27,7 +29,7 @@ services:
     depends_on:
       - backend_agenda
     ports:
-      - "3000:3000"
+      - "3000:80"
 
   cypress:
     build:
