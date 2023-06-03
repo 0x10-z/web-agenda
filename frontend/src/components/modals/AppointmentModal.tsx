@@ -48,7 +48,12 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
       setSelectedDate(new Date());
     } else if (appointment) {
       // If update, set appointment data
-      setTime(appointment.appointment_datetime.toLocaleTimeString());
+      setTime(
+        appointment.appointment_datetime.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      );
       setSelectedDate(appointment.appointment_datetime);
       setDescription(appointment.description);
     } else {
@@ -113,7 +118,6 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
 
     return <i data-testid={`modal-calendar-day-${dateSuffix}`} />;
   }
-
   return (
     <ModalBase
       title={appointment ? "Actualizar" : "Crear"}
@@ -136,6 +140,7 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
         className="w-full border border-gray-500 p-2 mb-2 shadow-md"
         placeholder="Fecha"
       />
+
       <select
         value={time.slice(0, 5)}
         onChange={(e) => handleTimeChange(e)}
@@ -199,12 +204,11 @@ export const AppointmentModal: React.FC<AppointmentModalProps> = ({
 export default AppointmentModal;
 
 function generateTimeSlots() {
-  // Nuevo código para generar las opciones de tiempo de 30 minutos
   const timeOptions: string[] = [];
   const startTime = new Date();
-  startTime.setHours(7, 30, 0, 0); // Establece la hora de inicio en 00:00:00
+  startTime.setHours(7, 30, 0, 0);
   const endTime = new Date();
-  endTime.setHours(20, 30, 0, 0); // Establece la hora de fin en 23:30:00
+  endTime.setHours(20, 30, 0, 0);
 
   let currentTime = startTime;
   while (currentTime <= endTime) {
@@ -213,7 +217,7 @@ function generateTimeSlots() {
       minute: "2-digit",
     });
     timeOptions.push(formattedTime);
-    currentTime.setMinutes(currentTime.getMinutes() + 30);
+    currentTime.setMinutes(currentTime.getMinutes() + 15);
   }
 
   return timeOptions;

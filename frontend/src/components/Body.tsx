@@ -183,7 +183,7 @@ export default function Body({ user }: BodyProps) {
                       }`}
                       data-testid={`li-${event.description}`}
                     >
-                      {index + 1} - {event.description} - {event.localeTime()}
+                      {event.description} - {event.localeTime()}
                     </li>
                   ))
                 ) : (
